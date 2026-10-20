@@ -1,0 +1,13 @@
+# Core (closet + outfits + app)
+numpy>=1.26
+streamlit>=1.40
+segno>=1.6            # QR code in run.sh
+# Vision pipeline
+opencv-python-headless>=4.8
+av>=13                # PyAV: HEVC/rotation fallback decoder
+pillow>=10
+scikit-learn>=1.4
+torch>=2.2
+transformers>=4.51
+# Tests
+pytest>=8

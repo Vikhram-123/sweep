@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+closet/
+.pytest_cache/
+*.zip
+scripts/demo_data/
+.DS_Store

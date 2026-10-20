@@ -1,0 +1,15 @@
+[server]
+address = "0.0.0.0"
+port = 8501
+headless = true
+maxUploadSize = 1024        # MB (closet videos from an iPhone can be big)
+maxMessageSize = 1024
+
+[client]
+toolbarMode = "minimal"     # no Deploy button over the title on a phone
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+primaryColor = "#3b6e5a"
