@@ -1,0 +1,8 @@
+{
+  "name": "model_a_text_concat_seed1",
+  "split": "test",
+  "compat_auc": 0.9282080790282906,
+  "fitb_acc": 0.6937603169362826,
+  "best_epoch": 4,
+  "notes": "Model A, features=concat"
+}

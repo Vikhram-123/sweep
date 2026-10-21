@@ -1,0 +1,8 @@
+{
+  "name": "model_a_text_only",
+  "split": "test",
+  "compat_auc": 0.8201295150509966,
+  "fitb_acc": 0.4983823043908881,
+  "best_epoch": 7,
+  "notes": "Model A, encoder=text"
+}

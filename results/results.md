@@ -39,6 +39,14 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 | model_a_neg_knn50 | FashionCLIP (frozen) | 3 | 0.911 | 66.6% | 0.888 ± 0.002 | 64.1% ± 0.1 | Model A, half kNN negatives, half random same-type |
 | model_a_neg_semihard | FashionCLIP (frozen) | 3 | 0.934 | 69.3% | 0.912 ± 0.002 | 66.9% ± 0.8 | Model A, batch semi-hard mined negatives (closest farther than the positive) |
 
+**Image + title text (Model A, FashionCLIP)**
+
+| model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |
+|---|---|---|---|---|---|---|---|
+| model_a_text_concat | FashionCLIP (frozen) + title text (concat) | 3 | 0.945 | 70.4% | 0.926 ± 0.003 | 69.1% ± 0.3 | Model A, features=concat |
+| model_a_text_mean | FashionCLIP (frozen) + title text (mean) | 3 | 0.938 | 68.6% | 0.923 ± 0.003 | 68.0% ± 0.4 | Model A, features=mean |
+| model_a_text_only | FashionCLIP text (frozen) | 3 | 0.834 | 50.6% | 0.819 ± 0.001 | 49.6% ± 0.5 | Model A, encoder=text |
+
 **Published (Polyvore Outfits disjoint)**
 
 | model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |

@@ -1,0 +1,8 @@
+{
+  "name": "model_a_text_mean_seed2",
+  "split": "test",
+  "compat_auc": 0.9198355829817649,
+  "fitb_acc": 0.6757345658633213,
+  "best_epoch": 9,
+  "notes": "Model A, features=mean"
+}

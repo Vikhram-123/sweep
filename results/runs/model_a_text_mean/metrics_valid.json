@@ -1,0 +1,8 @@
+{
+  "name": "model_a_text_mean",
+  "split": "valid",
+  "compat_auc": 0.9377200000000001,
+  "fitb_acc": 0.688,
+  "best_epoch": 7,
+  "notes": "Model A, features=mean"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "model_a_text_only_seed2",
+  "split": "valid",
+  "compat_auc": 0.8297922222222222,
+  "fitb_acc": 0.5033333333333333,
+  "best_epoch": 4,
+  "notes": "Model A, encoder=text"
+}
