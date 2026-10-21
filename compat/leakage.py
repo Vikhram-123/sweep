@@ -118,7 +118,7 @@ def main(argv=None) -> None:
     from .evaluate import RUNS_DIR
     from .train import Bank, evaluate_model
 
-    rows = [("clip_cosine", compat_auc(test, cosine_scorer(emb)), fitb_accuracy(test, cosine_scorer(emb)),
+    rows = [("fashionclip_cosine", compat_auc(test, cosine_scorer(emb)), fitb_accuracy(test, cosine_scorer(emb)),
              compat_auc(clean, cosine_scorer(emb)), fitb_accuracy(clean, cosine_scorer(emb)))]
     bank = Bank.build()
     for run in args.runs:

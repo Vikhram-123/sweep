@@ -1,13 +1,14 @@
-model,source,seeds,compat_auc,compat_auc_std,fitb_acc,fitb_acc_std,notes
-random,ours,1,0.5024182936794217,,0.24641795972268074,,
-rules,ours,1,0.5049571932636217,,0.2365137008913833,,
-rules_clothing,ours,1,0.5116769413224709,,0.24311654011224826,,
-clip_cosine,ours,1,0.752866904178503,,0.5239352921756355,,
-model_a,ours,3,0.9149270757571347,0.0008018083141193735,0.6704302850225597,0.0035858544037708526,"MLP 512-256-128 on frozen FashionCLIP, triplet loss, same-type negatives"
-model_b,ours,3,0.9111812095708252,0.00286284743875449,0.6645097391878507,0.002823051611281827,"Model A + learned diagonal mask per type pair (66 pairs), masks init to 1"
-paper: Bi-LSTM + VSE (Han et al.),published,,0.62,,0.394,,"Vasileva et al. 2018, Table 5; ResNet-18 + text"
-paper: SiameseNet,published,,0.81,,0.518,,"Vasileva et al. 2018, Table 5; ResNet-18"
-paper: type-aware CSN T1:1,published,,0.82,,0.525,,"Vasileva et al. 2018, Table 5; ResNet-18"
-paper: type-aware CSN + VSE + Sim + Metric (512-D),published,,0.84,,0.552,,"Vasileva et al. 2018, Table 5; ResNet-18 + text"
-CSA-Net (Lin et al. 2020),published,,0.87,,0.5926,,"CVPR 2020, Table 1; ResNet-18, 64-D"
-OutfitTransformer (Sarkar et al. 2023),published,,0.88,,0.5948,,"WACV 2023, Tables 1–2; ResNet-18 + text"
+model,source,encoder,seeds,val_auc,val_fitb,compat_auc,compat_auc_std,fitb_acc,fitb_acc_std,notes
+fashionclip_cosine,ours,FashionCLIP (frozen),1,,,0.752866904178503,,0.5239352921756355,,mean pairwise cosine of frozen fashionclip embeddings
+random,ours,—,1,,,0.5024182936794217,,0.24641795972268074,,
+rules,ours,color tags + FashionCLIP zero-shot,1,,,0.5049571932636217,,0.2365137008913833,,
+rules_clothing,ours,color tags + FashionCLIP zero-shot,1,,,0.5116769413224709,,0.24311654011224826,,
+model_a,ours,FashionCLIP (frozen),3,0.9356975925925926,0.6865555555555556,0.9149270757571347,0.0008018083141193735,0.6704302850225597,0.0035858544037708526,"MLP 512-256-128 on frozen FashionCLIP, triplet loss, same-type negatives"
+model_b,ours,FashionCLIP (frozen),3,0.9337595555555556,0.6812222222222223,0.9111812095708252,0.00286284743875449,0.6645097391878507,0.002823051611281827,"Model A + learned diagonal mask per type pair (66 pairs), masks init to 1"
+model_b_masklr10,ours,FashionCLIP (frozen),3,0.9336128703703704,0.6805555555555555,0.9130256244585965,0.0018156142687532593,0.6678111587982832,0.0033752071097080598,"Model B, masks at 10x learning rate and no weight decay"
+Bi-LSTM + VSE (Han et al. 2017),published,ResNet-18 (fine-tuned) + text,,,,0.62,,0.394,,"Vasileva et al. 2018, Table 5"
+SiameseNet,published,ResNet-18 (fine-tuned),,,,0.81,,0.518,,"Vasileva et al. 2018, Table 5"
+Type-aware CSN T1:1,published,ResNet-18 (fine-tuned),,,,0.82,,0.525,,"Vasileva et al. 2018, Table 5"
+Type-aware CSN + VSE + Sim + Metric (512-D),published,ResNet-18 (fine-tuned) + text,,,,0.84,,0.552,,"Vasileva et al. 2018, Table 5"
+CSA-Net (Lin et al. 2020),published,ResNet-18 (fine-tuned),,,,0.87,,0.5926,,"CVPR 2020, Table 1"
+OutfitTransformer (Sarkar et al. 2023),published,ResNet-18 (fine-tuned) + text,,,,0.88,,0.5948,,"WACV 2023, Tables 1–2"

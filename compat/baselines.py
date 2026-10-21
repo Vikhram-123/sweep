@@ -5,7 +5,7 @@
 - random:            uniform noise (sanity check: AUC ~0.5, FITB ~25%)
 - rules:             sweep/outfits.py score_outfit, occasion/weather off, all items
 - rules_clothing:    same, accessories dropped (Sweep's taxonomy has no accessories)
-- clip_cosine:       mean pairwise cosine similarity of FashionCLIP embeddings
+- fashionclip_cosine: mean pairwise cosine similarity of FashionCLIP embeddings
 """
 from __future__ import annotations
 
@@ -83,8 +83,19 @@ def cosine_scorer(embs: dict[str, np.ndarray]):
     return score
 
 
-def main() -> None:
+def main(argv=None) -> None:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--encoder", default="fashionclip",
+                    help="fashionclip runs every baseline; another encoder (clip, resnet18, text) runs "
+                         "only its cosine baseline (clip -> openai_clip_cosine)")
+    args = ap.parse_args(argv)
     test = load_split("test")
+    if args.encoder != "fashionclip":
+        name = {"clip": "openai_clip_cosine"}.get(args.encoder, f"{args.encoder}_cosine")
+        evaluate(name, cosine_scorer(load_embeddings(["test"], args.encoder)), test,
+                 extra={"notes": f"mean pairwise cosine of frozen {args.encoder} embeddings"})
+        return
     rng = np.random.default_rng(0)
     evaluate("random", lambda ids: float(rng.random()), test)
 
@@ -93,7 +104,8 @@ def main() -> None:
     items = build_rule_items(test.item_ids, embs, colors)
     evaluate("rules", rules_scorer(items, clothing_only=False), test)
     evaluate("rules_clothing", rules_scorer(items, clothing_only=True), test)
-    evaluate("clip_cosine", cosine_scorer(embs), test)
+    evaluate("fashionclip_cosine", cosine_scorer(embs), test,
+             extra={"notes": "mean pairwise cosine of frozen fashionclip embeddings"})
 
 
 if __name__ == "__main__":

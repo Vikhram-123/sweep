@@ -8,3 +8,4 @@ scripts/demo_data/
 .DS_Store
 data/
 results/runs/*/model.pt
+logs/

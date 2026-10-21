@@ -1,0 +1,17 @@
+name: model_b_masklr10_seed2
+model: type_aware
+projection: diagonal
+notes: Model B, masks at 10x learning rate and no weight decay
+seed: 2
+device: cpu
+hidden: 256
+out_dim: 128
+dropout: 0.1
+normalize: true
+margin: 0.2
+lr: 0.001
+weight_decay: 0.0001
+batch_size: 512
+max_epochs: 50
+patience: 5
+proj_lr_mult: 10

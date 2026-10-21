@@ -1,0 +1,8 @@
+{
+  "name": "fashionclip_cosine",
+  "split": "test",
+  "compat_auc": 0.752866904178503,
+  "fitb_acc": 0.5239352921756355,
+  "eval_seconds": 2.7,
+  "notes": "mean pairwise cosine of frozen fashionclip embeddings"
+}

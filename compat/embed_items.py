@@ -27,6 +27,51 @@ import numpy as np
 from .data import DATA_DIR, SPLITS, iter_images, parquet_ids
 
 OUT_DIR = DATA_DIR / "emb"
+ENCODERS = {
+    "fashionclip": "patrickjohncyh/fashion-clip",   # CLIP ViT-B/32 fine-tuned on fashion products
+    "clip": "openai/clip-vit-base-patch32",          # the original OpenAI CLIP it was fine-tuned from
+    "resnet18": "microsoft/resnet-18",               # ImageNet-1k ResNet-18, the published papers' backbone
+}
+
+
+def out_dir(encoder: str = "fashionclip") -> Path:
+    return OUT_DIR if encoder == "fashionclip" else OUT_DIR / encoder
+
+
+class ResNetEmbedder:
+    """Frozen ImageNet ResNet-18: global-average-pooled 512-d features, L2-normalised."""
+
+    def __init__(self, model_id: str = ENCODERS["resnet18"], device: str | None = None):
+        import torch
+        from transformers import AutoImageProcessor, ResNetModel
+
+        from sweep.device import align_weights, get_device
+
+        self.torch = torch
+        self.device = device or get_device()
+        self.processor = AutoImageProcessor.from_pretrained(model_id)
+        self.model = align_weights(ResNetModel.from_pretrained(model_id).to(self.device), self.device).eval()
+
+    def embed_images(self, images: list[np.ndarray], batch_size: int = 32) -> np.ndarray:
+        from PIL import Image
+
+        from sweep.embed import l2norm
+
+        out = []
+        for i in range(0, len(images), batch_size):
+            batch = [Image.fromarray(im) for im in images[i:i + batch_size]]
+            inputs = self.processor(images=batch, return_tensors="pt").to(self.device)
+            with self.torch.inference_mode():
+                feats = self.model(**inputs).pooler_output.flatten(1)
+            out.append(feats.float().cpu().numpy())
+        return l2norm(np.concatenate(out))
+
+
+def make_embedder(encoder: str):
+    if encoder == "resnet18":
+        return ResNetEmbedder()
+    from sweep.embed import FashionClipEmbedder
+    return FashionClipEmbedder(model_id=ENCODERS[encoder])
 
 
 def product_rgba(img) -> np.ndarray:
@@ -54,10 +99,11 @@ def _color(img) -> dict:
     return {k: (v.tolist() if isinstance(v, np.ndarray) else v) for k, v in c.items()}
 
 
-def embed_split(split: str, embedder, shard: int, batch: int, workers: int) -> None:
+def embed_split(split: str, embedder, shard: int, batch: int, workers: int, encoder: str = "fashionclip") -> None:
     from sweep.device import free_memory
 
-    shard_dir = OUT_DIR / split
+    root = out_dir(encoder)
+    shard_dir = root / split
     shard_dir.mkdir(parents=True, exist_ok=True)
     ids = parquet_ids(split)
     n_shards = (len(ids) + shard - 1) // shard
@@ -79,7 +125,8 @@ def embed_split(split: str, embedder, shard: int, batch: int, workers: int) -> N
             break
         chunk_ids = [i for i, _ in chunk]
         imgs = [im for _, im in chunk]
-        colors = pool.map(_color, imgs)  # CPU work overlaps with the GPU forward pass below
+        with_colors = encoder == "fashionclip"
+        colors = pool.map(_color, imgs) if with_colors else iter([{}] * len(imgs))  # overlaps the GPU pass
         emb = np.concatenate([embedder.embed_images([np.asarray(im) for im in imgs[j:j + batch]], batch)
                               for j in range(0, len(imgs), batch)]).astype(np.float32)
         colors = list(colors)
@@ -94,25 +141,27 @@ def embed_split(split: str, embedder, shard: int, batch: int, workers: int) -> N
         print(f"[{split}] shard {k}/{n_shards}  {rate:.0f} img/s  eta {(todo - seen) / rate / 60:.1f} min",
               flush=True)
     pool.shutdown()
-    merge(split, ids)
+    merge(split, ids, encoder)
 
 
-def merge(split: str, ids: list[str]) -> None:
-    parts = [np.load(p) for p in sorted((OUT_DIR / split).glob("[0-9]*.npz"))]
+def merge(split: str, ids: list[str], encoder: str = "fashionclip") -> None:
+    root = out_dir(encoder)
+    parts = [np.load(p) for p in sorted((root / split).glob("[0-9]*.npz"))]
     all_ids = np.concatenate([p["ids"] for p in parts])
     emb = np.concatenate([p["emb"] for p in parts])
     colors = dict(zip(all_ids.tolist(), (json.loads(c) for p in parts for c in p["colors"])))
     assert sorted(all_ids.tolist()) == sorted(ids), "shards don't cover the split exactly"
-    np.savez(OUT_DIR / f"{split}.npz", ids=all_ids, emb=emb)
-    (OUT_DIR / f"{split}_colors.json").write_text(json.dumps(colors))
-    print(f"[{split}] merged -> {OUT_DIR / split}.npz  {emb.shape}", flush=True)
+    np.savez(root / f"{split}.npz", ids=all_ids, emb=emb)
+    if encoder == "fashionclip":
+        (root / f"{split}_colors.json").write_text(json.dumps(colors))
+    print(f"[{split}] merged -> {root / split}.npz  {emb.shape}", flush=True)
 
 
-def load_embeddings(splits=SPLITS) -> dict[str, np.ndarray]:
+def load_embeddings(splits=SPLITS, encoder: str = "fashionclip") -> dict[str, np.ndarray]:
     """item_id -> embedding for the given splits."""
     out = {}
     for s in splits:
-        d = np.load(OUT_DIR / f"{s}.npz")
+        d = np.load(out_dir(encoder) / f"{s}.npz")
         out.update(zip(d["ids"].tolist(), d["emb"]))
     return out
 
@@ -130,13 +179,13 @@ def main(argv=None) -> None:
     ap.add_argument("--batch", type=int, default=32)
     ap.add_argument("--shard", type=int, default=2048)
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--encoder", choices=list(ENCODERS), default="fashionclip")
     args = ap.parse_args(argv)
 
-    from sweep.embed import FashionClipEmbedder
-    embedder = FashionClipEmbedder()
-    print("device:", embedder.device, flush=True)
+    embedder = make_embedder(args.encoder)
+    print("encoder:", args.encoder, "device:", embedder.device, flush=True)
     for split in args.split or ["valid", "test", "train"]:
-        embed_split(split, embedder, args.shard, args.batch, args.workers)
+        embed_split(split, embedder, args.shard, args.batch, args.workers, args.encoder)
 
 
 if __name__ == "__main__":

@@ -18,3 +18,15 @@ def triplet_loss(anchor: torch.Tensor, positive: torch.Tensor, negative: torch.T
     d_pos = (anchor - positive).norm(dim=-1)
     d_neg = (anchor - negative).norm(dim=-1)
     return torch.relu(d_pos - d_neg + margin).mean()
+
+
+def squared_triplet_loss(anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor,
+                         margin: float) -> torch.Tensor:
+    """Same hinge as triplet_loss, on squared Euclidean distances (FaceNet-style).
+
+    Used only by the squared-vs-plain distance experiment (config distance: sq), where evaluation
+    also averages squared distances so training and testing measure the same quantity.
+    """
+    d_pos = ((anchor - positive) ** 2).sum(dim=-1)
+    d_neg = ((anchor - negative) ** 2).sum(dim=-1)
+    return torch.relu(d_pos - d_neg + margin).mean()
