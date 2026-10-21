@@ -13,12 +13,14 @@ import numpy as np
 
 from .evaluate import RUNS_DIR
 
-# Published Polyvore Outfits-D (disjoint) numbers: Vasileva et al., ECCV 2018, Table 5.
+# Published Polyvore Outfits-D (disjoint) numbers, all ResNet-18 image features (+ text where noted).
 PUBLISHED = [
-    ("paper: Bi-LSTM + VSE (Han et al.)", "published", 0.62, 0.394),
-    ("paper: SiameseNet", "published", 0.81, 0.518),
-    ("paper: type-aware CSN T1:1", "published", 0.82, 0.525),
-    ("paper: type-aware CSN + VSE + Sim + Metric (512-D)", "published", 0.84, 0.552),
+    ("paper: Bi-LSTM + VSE (Han et al.)", 0.62, 0.394, "Vasileva et al. 2018, Table 5; ResNet-18 + text"),
+    ("paper: SiameseNet", 0.81, 0.518, "Vasileva et al. 2018, Table 5; ResNet-18"),
+    ("paper: type-aware CSN T1:1", 0.82, 0.525, "Vasileva et al. 2018, Table 5; ResNet-18"),
+    ("paper: type-aware CSN + VSE + Sim + Metric (512-D)", 0.84, 0.552, "Vasileva et al. 2018, Table 5; ResNet-18 + text"),
+    ("CSA-Net (Lin et al. 2020)", 0.87, 0.5926, "CVPR 2020, Table 1; ResNet-18, 64-D"),
+    ("OutfitTransformer (Sarkar et al. 2023)", 0.88, 0.5948, "WACV 2023, Tables 1–2; ResNet-18 + text"),
 ]
 ORDER = ["random", "rules", "rules_clothing", "clip_cosine", "model_a", "model_b"]
 
@@ -38,9 +40,8 @@ def collect() -> list[dict]:
                      "notes": ms[0].get("notes", "")})
     rank = {n: i for i, n in enumerate(ORDER)}
     rows.sort(key=lambda r: (rank.get(r["model"], len(ORDER)), r["model"]))
-    rows += [{"model": n, "source": s, "seeds": None, "compat_auc": a, "compat_auc_std": None,
-              "fitb_acc": f, "fitb_acc_std": None, "notes": "Vasileva et al. 2018, Table 5 (Polyvore Outfits-D)"}
-             for n, s, a, f in PUBLISHED]
+    rows += [{"model": n, "source": "published", "seeds": None, "compat_auc": a, "compat_auc_std": None,
+              "fitb_acc": f, "fitb_acc_std": None, "notes": note} for n, a, f, note in PUBLISHED]
     return rows
 
 

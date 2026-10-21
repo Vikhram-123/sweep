@@ -1,0 +1,8 @@
+{
+  "name": "model_b_seed1",
+  "split": "valid",
+  "compat_auc": 0.9354484444444444,
+  "fitb_acc": 0.6863333333333334,
+  "best_epoch": 5,
+  "notes": "Model A + learned diagonal mask per type pair (66 pairs), masks init to 1"
+}
