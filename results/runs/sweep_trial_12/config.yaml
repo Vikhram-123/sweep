@@ -1,0 +1,16 @@
+name: sweep_trial_12
+model: pairwise
+notes: sweep trial 12
+seed: 0
+device: cpu
+hidden: 512
+out_dim: 128
+dropout: 0.1
+normalize: true
+margin: 0.2
+lr: 0.0003
+weight_decay: 0.0001
+batch_size: 512
+max_epochs: 50
+patience: 5
+features: concat

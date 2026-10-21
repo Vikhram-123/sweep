@@ -1,0 +1,147 @@
+{
+  "space": {
+    "margin": [
+      0.1,
+      0.15,
+      0.2,
+      0.3
+    ],
+    "lr": [
+      0.0003,
+      0.001,
+      0.002
+    ],
+    "out_dim": [
+      64,
+      128,
+      256
+    ],
+    "hidden": [
+      256,
+      512,
+      1024
+    ],
+    "dropout": [
+      0.0,
+      0.1,
+      0.2,
+      0.3
+    ]
+  },
+  "trials": [
+    {
+      "margin": 0.2,
+      "lr": 0.001,
+      "out_dim": 128,
+      "hidden": 256,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.3,
+      "lr": 0.0003,
+      "out_dim": 64,
+      "hidden": 512,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.15,
+      "lr": 0.0003,
+      "out_dim": 128,
+      "hidden": 512,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.3,
+      "lr": 0.002,
+      "out_dim": 256,
+      "hidden": 1024,
+      "dropout": 0.2
+    },
+    {
+      "margin": 0.1,
+      "lr": 0.002,
+      "out_dim": 128,
+      "hidden": 256,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.1,
+      "lr": 0.002,
+      "out_dim": 256,
+      "hidden": 1024,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.2,
+      "lr": 0.001,
+      "out_dim": 256,
+      "hidden": 256,
+      "dropout": 0.2
+    },
+    {
+      "margin": 0.2,
+      "lr": 0.002,
+      "out_dim": 128,
+      "hidden": 512,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.15,
+      "lr": 0.0003,
+      "out_dim": 64,
+      "hidden": 256,
+      "dropout": 0.0
+    },
+    {
+      "margin": 0.3,
+      "lr": 0.001,
+      "out_dim": 64,
+      "hidden": 512,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.2,
+      "lr": 0.002,
+      "out_dim": 64,
+      "hidden": 512,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.3,
+      "lr": 0.001,
+      "out_dim": 64,
+      "hidden": 256,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.2,
+      "lr": 0.0003,
+      "out_dim": 128,
+      "hidden": 512,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.3,
+      "lr": 0.0003,
+      "out_dim": 256,
+      "hidden": 1024,
+      "dropout": 0.3
+    },
+    {
+      "margin": 0.3,
+      "lr": 0.001,
+      "out_dim": 128,
+      "hidden": 256,
+      "dropout": 0.1
+    },
+    {
+      "margin": 0.15,
+      "lr": 0.002,
+      "out_dim": 256,
+      "hidden": 512,
+      "dropout": 0.2
+    }
+  ],
+  "base": "model_a + features=concat",
+  "seed": 0
+}

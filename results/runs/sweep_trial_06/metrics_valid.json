@@ -1,0 +1,8 @@
+{
+  "name": "sweep_trial_06",
+  "split": "valid",
+  "compat_auc": 0.9454501111111111,
+  "fitb_acc": 0.7056666666666667,
+  "best_epoch": 12,
+  "notes": "sweep trial 6"
+}
