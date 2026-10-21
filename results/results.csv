@@ -20,6 +20,7 @@ model_a_sq,ours,FashionCLIP (frozen),3,0.9352903333333334,0.6814444444444444,0.9
 model_a_text_concat,ours,FashionCLIP (frozen) + title text (concat),3,0.9445747777777777,0.7036666666666668,0.925563595053037,0.0033153152740872534,0.6909651149994498,0.003324012055530891,"Model A, features=concat"
 model_a_text_mean,ours,FashionCLIP (frozen) + title text (mean),3,0.9375350740740741,0.6861111111111112,0.9227480897670778,0.0025355501510846284,0.6798943545724662,0.0036207408044516614,"Model A, features=mean"
 model_a_text_only,ours,FashionCLIP text (frozen),3,0.8339137037037037,0.5064444444444445,0.818932828736033,0.001063766934613512,0.4955210740618466,0.004955796302056878,"Model A, encoder=text"
+combined,ours,FashionCLIP (frozen) + title text (concat),3,0.945421,0.7040000000000001,0.9277423830378461,0.0011573483348682563,0.6895785187630681,0.004424066524662368,"Model A + title text (concat) + sweep winner (out_dim 256, dropout 0.2)"
 Bi-LSTM + VSE (Han et al. 2017),published,ResNet-18 (fine-tuned) + text,,,,0.62,,0.394,,"Vasileva et al. 2018, Table 5"
 SiameseNet,published,ResNet-18 (fine-tuned),,,,0.81,,0.518,,"Vasileva et al. 2018, Table 5"
 Type-aware CSN T1:1,published,ResNet-18 (fine-tuned),,,,0.82,,0.525,,"Vasileva et al. 2018, Table 5"

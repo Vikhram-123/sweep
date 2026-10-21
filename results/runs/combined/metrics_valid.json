@@ -1,0 +1,8 @@
+{
+  "name": "combined",
+  "split": "valid",
+  "compat_auc": 0.9454501111111111,
+  "fitb_acc": 0.7056666666666667,
+  "best_epoch": 12,
+  "notes": "Model A + title text (concat) + sweep winner (out_dim 256, dropout 0.2)"
+}

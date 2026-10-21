@@ -53,6 +53,12 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 | model_a_text_mean | FashionCLIP (frozen) + title text (mean) | 3 | 0.938 | 68.6% | 0.923 ± 0.003 | 68.0% ± 0.4 | Model A, features=mean |
 | model_a_text_only | FashionCLIP text (frozen) | 3 | 0.834 | 50.6% | 0.819 ± 0.001 | 49.6% ± 0.5 | Model A, encoder=text |
 
+**Combined model**
+
+| model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |
+|---|---|---|---|---|---|---|---|
+| combined | FashionCLIP (frozen) + title text (concat) | 3 | 0.945 | 70.4% | 0.928 ± 0.001 | 69.0% ± 0.4 | Model A + title text (concat) + sweep winner (out_dim 256, dropout 0.2) |
+
 **Published (Polyvore Outfits disjoint)**
 
 | model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |

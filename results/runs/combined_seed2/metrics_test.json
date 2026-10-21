@@ -1,0 +1,8 @@
+{
+  "name": "combined_seed2",
+  "split": "test",
+  "compat_auc": 0.9270693824557833,
+  "fitb_acc": 0.689534499834929,
+  "best_epoch": 5,
+  "notes": "Model A + title text (concat) + sweep winner (out_dim 256, dropout 0.2)"
+}
