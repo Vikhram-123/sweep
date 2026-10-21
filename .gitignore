@@ -9,3 +9,4 @@ scripts/demo_data/
 data/
 results/runs/*/model.pt
 logs/
+checkpoints/

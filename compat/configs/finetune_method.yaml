@@ -1,0 +1,33 @@
+# Method track: ImageNet ResNet-18 in the papers' layout, fine-tuned end to end (image only).
+name: ft_method_resnet18
+notes: ResNet-18 (torchvision ImageNet V1, 112 px, conv1..layer3) fine-tuned end to end, InfoNCE, 64-d
+encoder: resnet18_paper
+unfreeze_blocks: all          # like the papers: every layer trains
+seed: 0
+device: auto                  # cuda > mps > cpu
+amp: true                     # CUDA only: bf16 if supported (A100), else fp16 + GradScaler (T4)
+grad_checkpointing: false     # ResNet-18 at 112 px is small; not needed
+
+hidden: 256
+out_dim: 64                   # the papers' embedding size
+dropout: 0.1
+temperature_init: 0.25        # what frozen ResNet-18 + InfoNCE converged to (Phase 1)
+
+batch_size: 512               # pairs per step (1024 images); InfoNCE likes big batches. --find-batch to check
+eval_batch_size: 512
+pairs_per_epoch: 131072       # 256 steps per epoch at batch 512
+max_epochs: 30
+patience: 4                   # epochs without a better validation AUC
+
+lr_encoder: 0.0001            # small: ImageNet features are a good start; don't wreck them
+lr_head: 0.001
+weight_decay_encoder: 0.0001
+weight_decay_head: 0.0001
+freeze_epochs: 1              # head-only warmup: the random head would send garbage gradients into the encoder
+warmup_epochs_encoder: 1      # then the encoder's LR ramps from 0 over one epoch
+warmup_epochs_head: 0.1
+
+log_every: 50
+ckpt_every: 200               # steps; plus every epoch
+smoke_batch_size: 8
+smoke_steps: 3
