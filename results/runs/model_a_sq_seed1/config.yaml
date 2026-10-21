@@ -1,0 +1,16 @@
+name: model_a_sq_seed1
+model: pairwise
+notes: Model A, squared distance in loss and eval, margin 0.4 (tuned on val)
+seed: 1
+device: cpu
+hidden: 256
+out_dim: 128
+dropout: 0.1
+normalize: true
+margin: 0.4
+lr: 0.001
+weight_decay: 0.0001
+batch_size: 512
+max_epochs: 50
+patience: 5
+distance: sq

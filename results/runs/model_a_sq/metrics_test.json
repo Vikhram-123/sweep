@@ -1,0 +1,8 @@
+{
+  "name": "model_a_sq",
+  "split": "test",
+  "compat_auc": 0.9163388509948018,
+  "fitb_acc": 0.6651039947177286,
+  "best_epoch": 10,
+  "notes": "Model A, squared distance in loss and eval, margin 0.4 (tuned on val)"
+}

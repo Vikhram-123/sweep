@@ -39,6 +39,12 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 | model_a_neg_knn50 | FashionCLIP (frozen) | 3 | 0.911 | 66.6% | 0.888 ± 0.002 | 64.1% ± 0.1 | Model A, half kNN negatives, half random same-type |
 | model_a_neg_semihard | FashionCLIP (frozen) | 3 | 0.934 | 69.3% | 0.912 ± 0.002 | 66.9% ± 0.8 | Model A, batch semi-hard mined negatives (closest farther than the positive) |
 
+**Squared vs plain distance (Model A, FashionCLIP)**
+
+| model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |
+|---|---|---|---|---|---|---|---|
+| model_a_sq | FashionCLIP (frozen) | 3 | 0.935 | 68.1% | 0.914 ± 0.002 | 66.4% ± 0.2 | Model A, squared distance in loss and eval, margin 0.4 (tuned on val) |
+
 **Image + title text (Model A, FashionCLIP)**
 
 | model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |

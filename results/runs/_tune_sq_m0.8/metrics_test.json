@@ -1,0 +1,8 @@
+{
+  "name": "_tune_sq_m0.8",
+  "split": "test",
+  "compat_auc": 0.9048683394077346,
+  "fitb_acc": 0.6483988114889403,
+  "best_epoch": 8,
+  "notes": "MLP 512-256-128 on frozen FashionCLIP, triplet loss, same-type negatives"
+}
