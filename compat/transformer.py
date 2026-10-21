@@ -27,7 +27,10 @@ class OutfitTransformer(nn.Module):
     def __init__(self, in_dim: int, n_types: int, d_model: int = 128, heads: int = 4, layers: int = 2,
                  ff: int = 256, dropout: float = 0.1, **_):
         super().__init__()
-        self.item_proj = nn.Linear(in_dim, d_model)
+        # LayerNorm puts item tokens on the same scale as the type embeddings (norm ~11 at init).
+        # Without it, unit-norm inputs project to norm ~0.45: the type embedding (identical for
+        # real and fake outfits) drowns out the item signal and training sat at chance.
+        self.item_proj = nn.Sequential(nn.Linear(in_dim, d_model), nn.LayerNorm(d_model))
         self.type_emb = nn.Embedding(n_types, d_model)
         self.cls = nn.Parameter(torch.zeros(1, 1, d_model))
         layer = nn.TransformerEncoderLayer(d_model, heads, ff, dropout, batch_first=True, norm_first=True)
