@@ -133,12 +133,13 @@ class GroundingDinoDetector:
         import torch
         from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor
 
-        from .device import get_device
+        from .device import align_weights, get_device
 
         self.torch = torch
         self.device = device or get_device()
         self.processor = AutoProcessor.from_pretrained(model_id)
-        self.model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(self.device).eval()
+        self.model = align_weights(AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(self.device),
+                                   self.device).eval()
         self.box_threshold = box_threshold
         self.text_threshold = text_threshold
         self.prompt = prompt

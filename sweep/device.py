@@ -32,6 +32,21 @@ def get_device(prefer: str | None = None) -> str:
     return "cpu"
 
 
+def align_weights(model, device: str):
+    """Copy CPU weights out of the memory-mapped checkpoint into aligned buffers.
+
+    transformers maps safetensors files zero-copy, so on CPU each weight lives at its byte offset
+    in the file -- for these checkpoints 2 bytes off float32 alignment. Apple's BLAS then returns
+    NaNs (batched matmul) or dies with SIGBUS (batch-1 matrix-vector). Moving to mps/cuda already
+    copies, so this only does work on CPU.
+    """
+    if device == "cpu":
+        for t in list(model.parameters()) + list(model.buffers()):
+            if t.data_ptr() % 64:
+                t.data = t.data.clone()
+    return model
+
+
 def free_memory() -> None:
     """Return cached GPU blocks to the system between pipeline stages."""
     import sys

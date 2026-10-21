@@ -1,0 +1,9 @@
+model,source,compat_auc,fitb_acc,notes
+random,ours,0.5024182936794217,0.24641795972268074,
+rules,ours,0.5049571932636217,0.2365137008913833,
+rules_clothing,ours,0.5116769413224709,0.24311654011224826,
+clip_cosine,ours,0.752866904178503,0.5239352921756355,
+paper: Bi-LSTM + VSE (Han et al.),published,0.62,0.394,"Vasileva et al. 2018, Table 5 (Polyvore Outfits-D)"
+paper: SiameseNet,published,0.81,0.518,"Vasileva et al. 2018, Table 5 (Polyvore Outfits-D)"
+paper: type-aware CSN T1:1,published,0.82,0.525,"Vasileva et al. 2018, Table 5 (Polyvore Outfits-D)"
+paper: type-aware CSN + VSE + Sim + Metric (512-D),published,0.84,0.552,"Vasileva et al. 2018, Table 5 (Polyvore Outfits-D)"

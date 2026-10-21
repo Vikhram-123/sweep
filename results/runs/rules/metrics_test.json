@@ -1,0 +1,7 @@
+{
+  "name": "rules",
+  "split": "test",
+  "compat_auc": 0.5049571932636217,
+  "fitb_acc": 0.2365137008913833,
+  "eval_seconds": 1.6
+}

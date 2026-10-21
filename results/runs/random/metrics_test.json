@@ -1,0 +1,7 @@
+{
+  "name": "random",
+  "split": "test",
+  "compat_auc": 0.5024182936794217,
+  "fitb_acc": 0.24641795972268074,
+  "eval_seconds": 0.2
+}

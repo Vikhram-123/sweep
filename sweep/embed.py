@@ -35,12 +35,12 @@ class FashionClipEmbedder:
         import torch
         from transformers import CLIPModel, CLIPProcessor
 
-        from .device import get_device
+        from .device import align_weights, get_device
 
         self.torch = torch
         self.device = device or get_device()
         self.processor = CLIPProcessor.from_pretrained(model_id)
-        self.model = CLIPModel.from_pretrained(model_id).to(self.device).eval()
+        self.model = align_weights(CLIPModel.from_pretrained(model_id).to(self.device), self.device).eval()
         self._text_cache: dict[str, np.ndarray] = {}
 
     def embed_images(self, images: list[np.ndarray], batch_size: int = 32) -> np.ndarray:
@@ -56,10 +56,12 @@ class FashionClipEmbedder:
         return l2norm(np.concatenate(out)) if out else np.zeros((0, 512), np.float32)
 
     def embed_texts(self, texts: list[str]) -> np.ndarray:
-        missing = [t for t in texts if t not in self._text_cache]
+        missing = list(dict.fromkeys(t for t in texts if t not in self._text_cache))
         if missing:
             inputs = self.processor(text=missing, return_tensors="pt", padding=True).to(self.device)
             with self.torch.inference_mode():
                 feats = l2norm(_features(self.model.get_text_features(**inputs)).float().cpu().numpy())
+            if not np.isfinite(feats).all():
+                raise RuntimeError("non-finite text embeddings; are the model weights aligned?")
             self._text_cache.update(zip(missing, feats))
         return np.stack([self._text_cache[t] for t in texts])

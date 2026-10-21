@@ -1,0 +1,7 @@
+{
+  "name": "rules_clothing",
+  "split": "test",
+  "compat_auc": 0.5116769413224709,
+  "fitb_acc": 0.24311654011224826,
+  "eval_seconds": 1.4
+}

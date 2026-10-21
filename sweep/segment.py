@@ -49,12 +49,12 @@ class SamSegmenter:
         import torch
         from transformers import SamModel, SamProcessor
 
-        from .device import get_device
+        from .device import align_weights, get_device
 
         self.torch = torch
         self.device = device or get_device()
         self.processor = SamProcessor.from_pretrained(model_id)
-        self.model = SamModel.from_pretrained(model_id).to(self.device).eval()
+        self.model = align_weights(SamModel.from_pretrained(model_id).to(self.device), self.device).eval()
 
     def segment(self, image: np.ndarray, boxes) -> list[np.ndarray]:
         if not boxes:
