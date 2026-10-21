@@ -30,8 +30,45 @@ OUT_DIR = DATA_DIR / "emb"
 ENCODERS = {
     "fashionclip": "patrickjohncyh/fashion-clip",   # CLIP ViT-B/32 fine-tuned on fashion products
     "clip": "openai/clip-vit-base-patch32",          # the original OpenAI CLIP it was fine-tuned from
-    "resnet18": "microsoft/resnet-18",               # ImageNet-1k ResNet-18, the published papers' backbone
+    "resnet18": "microsoft/resnet-18",               # ImageNet-1k ResNet-18 (HF port; used in the first ablation)
+    # torchvision IMAGENET1K_V1 -- the exact weights the published papers load (model_zoo resnet18):
+    "tv_resnet18": "torchvision:resnet18:224:layer4",          # standard: 224 px, full network, 512-d
+    "tv_resnet18_paper": "torchvision:resnet18:112:layer3",    # as in Vasileva et al.'s code: 112 px, layer4 dropped, 256-d
 }
+
+
+class TorchvisionResNet18:
+    """torchvision ImageNet ResNet-18 (IMAGENET1K_V1), optionally truncated after layer3 like the
+    reference implementation (mvasil/fashion-compatibility Resnet_18.py: 112 px input, no layer4,
+    7x7 average pool -> 256-d). Global-average-pooled features, L2-normalised."""
+
+    def __init__(self, size: int = 224, last: str = "layer4", device: str | None = None):
+        import torch
+        import torchvision
+        from torchvision.transforms import v2 as T
+
+        from sweep.device import align_weights, get_device
+
+        self.torch = torch
+        self.device = device or get_device()
+        m = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.IMAGENET1K_V1)
+        layers = [m.conv1, m.bn1, m.relu, m.maxpool, m.layer1, m.layer2, m.layer3]
+        if last == "layer4":
+            layers.append(m.layer4)
+        self.model = align_weights(torch.nn.Sequential(*layers, torch.nn.AdaptiveAvgPool2d(1), torch.nn.Flatten())
+                                   .to(self.device), self.device).eval()
+        self.transform = T.Compose([T.ToImage(), T.Resize((size, size), antialias=True), T.ToDtype(torch.float32, scale=True),
+                                    T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+
+    def embed_images(self, images: list[np.ndarray], batch_size: int = 64) -> np.ndarray:
+        from sweep.embed import l2norm
+
+        out = []
+        for i in range(0, len(images), batch_size):
+            x = self.torch.stack([self.transform(im) for im in images[i:i + batch_size]]).to(self.device)
+            with self.torch.inference_mode():
+                out.append(self.model(x).float().cpu().numpy())
+        return l2norm(np.concatenate(out))
 
 
 def out_dir(encoder: str = "fashionclip") -> Path:
@@ -70,6 +107,9 @@ class ResNetEmbedder:
 def make_embedder(encoder: str):
     if encoder == "resnet18":
         return ResNetEmbedder()
+    if ENCODERS[encoder].startswith("torchvision:"):
+        _, _, size, last = ENCODERS[encoder].split(":")
+        return TorchvisionResNet18(int(size), last)
     from sweep.embed import FashionClipEmbedder
     return FashionClipEmbedder(model_id=ENCODERS[encoder])
 

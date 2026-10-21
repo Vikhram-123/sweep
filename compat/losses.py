@@ -30,3 +30,19 @@ def squared_triplet_loss(anchor: torch.Tensor, positive: torch.Tensor, negative:
     d_pos = ((anchor - positive) ** 2).sum(dim=-1)
     d_neg = ((anchor - negative) ** 2).sum(dim=-1)
     return torch.relu(d_pos - d_neg + margin).mean()
+
+
+def info_nce_loss(anchor: torch.Tensor, positive: torch.Tensor, valid_neg: torch.Tensor,
+                  logit_scale: torch.Tensor) -> torch.Tensor:
+    """InfoNCE with in-batch negatives.
+
+    anchor, positive: (B, d) L2-normalised embeddings; row i of `positive` is anchor i's true partner.
+    valid_neg: (B, B) bool. valid_neg[i, j] is True when positive[j] may serve as a negative for
+        anchor i (same category as positive[i], from a different outfit, not the same item).
+        The diagonal is False: positive[i] is the answer, not a negative.
+    logit_scale: scalar tensor = 1 / temperature (learned; the training loop keeps it positive).
+
+    Returns the mean over the batch of the cross-entropy of picking positive[i] for anchor i among
+    {positive[i]} + its valid negatives.
+    """
+    raise NotImplementedError("your turn -- see the hints in the chat")

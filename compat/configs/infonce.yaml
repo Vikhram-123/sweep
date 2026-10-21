@@ -1,0 +1,23 @@
+# Model A architecture trained with InfoNCE: in-batch same-category negatives, learned temperature.
+name: infonce
+model: pairwise
+loss: infonce
+notes: Model A trained with InfoNCE (in-batch same-category negatives, learned temperature)
+seed: 0
+device: cpu
+encoder: fashionclip
+
+hidden: 256
+out_dim: 128
+dropout: 0.1
+normalize: true          # required: logits are cosine similarities
+
+temperature_init: 0.07   # CLIP's initial temperature; learned in log space
+learn_temperature: true
+margin: 0.2              # unused by InfoNCE (kept so the triplet diagnostic code paths stay valid)
+lr: 0.001
+weight_decay: 0.0001
+batch_size: 512          # bigger batch = more in-batch negatives per anchor (~512/11 types ≈ 45)
+
+max_epochs: 50
+patience: 5

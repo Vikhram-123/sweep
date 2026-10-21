@@ -33,7 +33,7 @@ from sklearn.metrics import roc_auc_score
 from .data import SPLITS, Split, item_category, load_split
 from .embed_items import load_embeddings
 from .evaluate import RUNS_DIR
-from .losses import squared_triplet_loss, triplet_loss
+from .losses import info_nce_loss, squared_triplet_loss, triplet_loss
 from .models import build_model
 
 TEXT_ENCODER = "text"  # FashionCLIP text embeddings of item titles, written by compat.embed_text
@@ -273,6 +273,12 @@ def train(cfg: dict) -> dict:
     if negatives.startswith("batch_") and cfg["model"] != "pairwise":
         raise ValueError("batch mining is implemented for the pairwise model only")
     loss_fn = squared_triplet_loss if distance == "sq" else triplet_loss
+    loss_kind = cfg.get("loss", "triplet")
+    if loss_kind == "infonce" and not cfg.get("normalize", True):
+        raise ValueError("InfoNCE uses cosine similarities: set normalize: true")
+    # InfoNCE temperature, learned in log space (CLIP-style); scale = 1/temperature, capped at 100.
+    log_scale = torch.nn.Parameter(torch.tensor(float(np.log(1.0 / cfg.get("temperature_init", 0.07)))),
+                                   requires_grad=cfg.get("learn_temperature", True))
     # Type-pair projections (Model B) can get their own learning rate and no weight decay
     # (config proj_lr_mult); with one shared rate they barely move away from their init.
     proj = [p for n, p in model.named_parameters() if n in ("masks", "mats")]
@@ -281,6 +287,8 @@ def train(cfg: dict) -> dict:
     if proj:
         groups.append({"params": proj, "lr": cfg["lr"] * cfg.get("proj_lr_mult", 1.0),
                        "weight_decay": cfg["weight_decay"] if cfg.get("proj_lr_mult", 1.0) == 1.0 else 0.0})
+    if loss_kind == "infonce" and log_scale.requires_grad:
+        groups.append({"params": [log_scale], "weight_decay": 0.0})
     opt = torch.optim.Adam(groups, lr=cfg["lr"], weight_decay=cfg["weight_decay"])
     print(f"{cfg['name']}: {sum(p.numel() for p in model.parameters()):,} params, input {bank.emb.shape[1]}-d, "
           f"{len(sampler):,} triplets/epoch, negatives {negatives}, distance {distance}, device {device}", flush=True)
@@ -297,20 +305,34 @@ def train(cfg: dict) -> dict:
             za = model(bank.emb[a].to(device), ta, tp)
             zp = model(bank.emb[p].to(device), tp, ta)
             zn = model(bank.emb[ng].to(device), tp, ta)  # negative has the positive's type
-            if negatives.startswith("batch_"):
-                zn = mine_batch_negatives(za, zp, zn, tp, outfit.to(device), rows.to(device), distance, negatives)
-            loss = loss_fn(za, zp, zn, cfg["margin"])
+            if loss_kind == "infonce":
+                outfit_d, p_d = outfit.to(device), p.to(device)
+                valid_neg = (tp[None, :] == tp[:, None]) & (outfit_d[None, :] != outfit_d[:, None]) \
+                    & (p_d[None, :] != p_d[:, None])
+                scale = log_scale.exp().clamp(max=100.0)
+                loss = info_nce_loss(za, zp, valid_neg, scale)
+            else:
+                if negatives.startswith("batch_"):
+                    zn = mine_batch_negatives(za, zp, zn, tp, outfit.to(device), rows.to(device), distance, negatives)
+                loss = loss_fn(za, zp, zn, cfg["margin"])
             opt.zero_grad()
             loss.backward()
             opt.step()
             with torch.no_grad():  # diagnostic, independent of how the loss is written
-                gap = pair_dist(za, zn, distance) - pair_dist(za, zp, distance)
-                active += float((gap < cfg["margin"]).sum())
+                if loss_kind == "infonce":  # anchor ranks some valid in-batch negative above its positive
+                    sim = za @ zp.T
+                    beaten = (sim.masked_fill(~valid_neg, -2.0).max(1).values >= sim.diagonal())
+                    active += float(beaten.sum())
+                else:
+                    gap = pair_dist(za, zn, distance) - pair_dist(za, zp, distance)
+                    active += float((gap < cfg["margin"]).sum())
             losses += loss.item() * len(a)
             n += len(a)
         val = evaluate_model(model, bank, valid, device, distance)
         h = {"epoch": epoch, "train_loss": losses / n, "active_frac": active / n,
              "val_auc": val["compat_auc"], "val_fitb": val["fitb_acc"], "seconds": round(time.time() - t0, 1)}
+        if loss_kind == "infonce":
+            h["temperature"] = float(1.0 / log_scale.exp().clamp(max=100.0))
         history.append(h)
         improved = h["val_auc"] > best
         if improved:
