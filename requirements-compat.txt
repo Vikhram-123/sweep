@@ -4,3 +4,4 @@ huggingface_hub>=0.30   # dataset download (hf auth login for the gated repo)
 pyarrow>=15             # parquet with embedded item images
 pyyaml>=6               # run configs
 matplotlib>=3.8         # training curves
+open_clip_torch>=3.0   # Marqo-FashionSigLIP encoder (step 5)

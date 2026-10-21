@@ -34,7 +34,65 @@ ENCODERS = {
     # torchvision IMAGENET1K_V1 -- the exact weights the published papers load (model_zoo resnet18):
     "tv_resnet18": "torchvision:resnet18:224:layer4",          # standard: 224 px, full network, 512-d
     "tv_resnet18_paper": "torchvision:resnet18:112:layer3",    # as in Vasileva et al.'s code: 112 px, layer4 dropped, 256-d
+    # Newer open fashion encoders (step 5), both Apache-2.0:
+    "marqo_fashionsiglip": "open_clip:hf-hub:Marqo/marqo-fashionSigLIP",   # SigLIP ViT-B/16 fine-tuned on fashion (2024)
+    "zooclaw_fashionsiglip2": "hf:srpone/zooclaw-fashionsiglip2",          # SigLIP2 ViT-B/16 @384 fine-tuned on fashion (2026)
 }
+
+
+class OpenClipImageEmbedder:
+    """Image tower of an open_clip model (its own preprocessing), L2-normalised."""
+
+    def __init__(self, name: str, device: str | None = None):
+        import open_clip
+        import torch
+
+        from sweep.device import align_weights, get_device
+
+        self.torch = torch
+        self.device = device or get_device()
+        model, _, self.preprocess = open_clip.create_model_and_transforms(name)
+        self.model = align_weights(model.to(self.device), self.device).eval()
+
+    def embed_images(self, images: list[np.ndarray], batch_size: int = 32) -> np.ndarray:
+        from PIL import Image
+
+        from sweep.embed import l2norm
+
+        out = []
+        for i in range(0, len(images), batch_size):
+            x = self.torch.stack([self.preprocess(Image.fromarray(im)) for im in images[i:i + batch_size]]).to(self.device)
+            with self.torch.inference_mode():
+                out.append(self.model.encode_image(x).float().cpu().numpy())
+        return l2norm(np.concatenate(out))
+
+
+class HFSiglipImageEmbedder:
+    """Image tower of a transformers (Siglip/Siglip2) model via get_image_features, L2-normalised."""
+
+    def __init__(self, model_id: str, device: str | None = None):
+        import torch
+        from transformers import AutoModel, AutoProcessor
+
+        from sweep.device import align_weights, get_device
+
+        self.torch = torch
+        self.device = device or get_device()
+        self.processor = AutoProcessor.from_pretrained(model_id)
+        self.model = align_weights(AutoModel.from_pretrained(model_id).to(self.device), self.device).eval()
+
+    def embed_images(self, images: list[np.ndarray], batch_size: int = 32) -> np.ndarray:
+        from PIL import Image
+
+        from sweep.embed import _features, l2norm
+
+        out = []
+        for i in range(0, len(images), batch_size):
+            batch = [Image.fromarray(im) for im in images[i:i + batch_size]]
+            inputs = self.processor(images=batch, return_tensors="pt").to(self.device)
+            with self.torch.inference_mode():
+                out.append(_features(self.model.get_image_features(**inputs)).float().cpu().numpy())
+        return l2norm(np.concatenate(out))
 
 
 class TorchvisionResNet18:
@@ -107,6 +165,10 @@ class ResNetEmbedder:
 def make_embedder(encoder: str):
     if encoder == "resnet18":
         return ResNetEmbedder()
+    if ENCODERS[encoder].startswith("open_clip:"):
+        return OpenClipImageEmbedder(ENCODERS[encoder].removeprefix("open_clip:"))
+    if ENCODERS[encoder].startswith("hf:"):
+        return HFSiglipImageEmbedder(ENCODERS[encoder].removeprefix("hf:"))
     if ENCODERS[encoder].startswith("torchvision:"):
         _, _, size, last = ENCODERS[encoder].split(":")
         return TorchvisionResNet18(int(size), last)
