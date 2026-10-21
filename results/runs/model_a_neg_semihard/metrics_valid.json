@@ -1,0 +1,8 @@
+{
+  "name": "model_a_neg_semihard",
+  "split": "valid",
+  "compat_auc": 0.9311547777777778,
+  "fitb_acc": 0.6826666666666666,
+  "best_epoch": 10,
+  "notes": "Model A, batch semi-hard mined negatives (closest farther than the positive)"
+}

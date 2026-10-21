@@ -1,0 +1,8 @@
+{
+  "name": "model_a_neg_knn",
+  "split": "valid",
+  "compat_auc": 0.7619353333333333,
+  "fitb_acc": 0.5516666666666666,
+  "best_epoch": 15,
+  "notes": "Model A, negatives from the positive's 50 nearest same-type neighbours (cos <= 0.95)"
+}

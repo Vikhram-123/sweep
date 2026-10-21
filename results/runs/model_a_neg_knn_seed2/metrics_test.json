@@ -1,0 +1,8 @@
+{
+  "name": "model_a_neg_knn_seed2",
+  "split": "test",
+  "compat_auc": 0.7249916330975109,
+  "fitb_acc": 0.5253879168042258,
+  "best_epoch": 5,
+  "notes": "Model A, negatives from the positive's 50 nearest same-type neighbours (cos <= 0.95)"
+}

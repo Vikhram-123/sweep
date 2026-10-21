@@ -1,0 +1,8 @@
+{
+  "name": "model_a_neg_knn50",
+  "split": "valid",
+  "compat_auc": 0.9117263333333332,
+  "fitb_acc": 0.6683333333333333,
+  "best_epoch": 12,
+  "notes": "Model A, half kNN negatives, half random same-type"
+}

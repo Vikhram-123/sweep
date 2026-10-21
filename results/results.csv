@@ -12,6 +12,10 @@ model_b_full,ours,FashionCLIP (frozen),3,0.9186388148148148,0.6642222222222222,0
 model_b_masklr10,ours,FashionCLIP (frozen),3,0.9336128703703704,0.6805555555555555,0.9130256244585965,0.0018156142687532593,0.6678111587982832,0.0033752071097080598,"Model B, masks at 10x learning rate and no weight decay"
 model_a_clip,ours,CLIP ViT-B/32 (frozen),3,0.9110399259259259,0.6434444444444444,0.8860341826813857,0.0008763272694517964,0.6193243094530648,0.001749856208676188,Model A on frozen OpenAI CLIP ViT-B/32 features
 model_a_resnet18,ours,ResNet-18 ImageNet (frozen),3,0.828509111111111,0.5127777777777778,0.8014928876333297,0.0010654319482079418,0.4946627049631342,0.0040197862478409405,Model A on frozen ImageNet ResNet-18 features
+model_a_neg_hard,ours,FashionCLIP (frozen),3,0.734676611111111,0.39855555555555555,0.7193670633274915,0.026981509576338474,0.3785187630681193,0.03501499604824862,"Model A, batch hardest mined negatives"
+model_a_neg_knn,ours,FashionCLIP (frozen),3,0.7517927222222222,0.5383333333333333,0.7352405685649847,0.010339520277971536,0.5280950808847805,0.006789375649615438,"Model A, negatives from the positive's 50 nearest same-type neighbours (cos <= 0.95)"
+model_a_neg_knn50,ours,FashionCLIP (frozen),3,0.9110964444444444,0.665888888888889,0.8883073403306572,0.0019324423978107244,0.6413777924507538,0.000973405717508296,"Model A, half kNN negatives, half random same-type"
+model_a_neg_semihard,ours,FashionCLIP (frozen),3,0.9340377407407408,0.6927777777777777,0.912123561233014,0.0020642755395261446,0.669043688786178,0.008344257788128594,"Model A, batch semi-hard mined negatives (closest farther than the positive)"
 Bi-LSTM + VSE (Han et al. 2017),published,ResNet-18 (fine-tuned) + text,,,,0.62,,0.394,,"Vasileva et al. 2018, Table 5"
 SiameseNet,published,ResNet-18 (fine-tuned),,,,0.81,,0.518,,"Vasileva et al. 2018, Table 5"
 Type-aware CSN T1:1,published,ResNet-18 (fine-tuned),,,,0.82,,0.525,,"Vasileva et al. 2018, Table 5"

@@ -1,0 +1,8 @@
+{
+  "name": "model_a_neg_hard",
+  "split": "test",
+  "compat_auc": 0.7497786893527636,
+  "fitb_acc": 0.41815780785737866,
+  "best_epoch": 4,
+  "notes": "Model A, batch hardest mined negatives"
+}

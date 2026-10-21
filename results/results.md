@@ -30,6 +30,15 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 | model_a_clip | CLIP ViT-B/32 (frozen) | 3 | 0.911 | 64.3% | 0.886 ± 0.001 | 61.9% ± 0.2 | Model A on frozen OpenAI CLIP ViT-B/32 features |
 | model_a_resnet18 | ResNet-18 ImageNet (frozen) | 3 | 0.829 | 51.3% | 0.801 ± 0.001 | 49.5% ± 0.4 | Model A on frozen ImageNet ResNet-18 features |
 
+**Hard negatives (Model A, FashionCLIP)**
+
+| model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |
+|---|---|---|---|---|---|---|---|
+| model_a_neg_hard | FashionCLIP (frozen) | 3 | 0.735 | 39.9% | 0.719 ± 0.027 | 37.9% ± 3.5 | Model A, batch hardest mined negatives |
+| model_a_neg_knn | FashionCLIP (frozen) | 3 | 0.752 | 53.8% | 0.735 ± 0.010 | 52.8% ± 0.7 | Model A, negatives from the positive's 50 nearest same-type neighbours (cos <= 0.95) |
+| model_a_neg_knn50 | FashionCLIP (frozen) | 3 | 0.911 | 66.6% | 0.888 ± 0.002 | 64.1% ± 0.1 | Model A, half kNN negatives, half random same-type |
+| model_a_neg_semihard | FashionCLIP (frozen) | 3 | 0.934 | 69.3% | 0.912 ± 0.002 | 66.9% ± 0.8 | Model A, batch semi-hard mined negatives (closest farther than the positive) |
+
 **Published (Polyvore Outfits disjoint)**
 
 | model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |
