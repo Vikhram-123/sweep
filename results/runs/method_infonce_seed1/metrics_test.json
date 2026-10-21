@@ -1,0 +1,8 @@
+{
+  "name": "method_infonce_seed1",
+  "split": "test",
+  "compat_auc": 0.8434876440910528,
+  "fitb_acc": 0.5617035325189832,
+  "best_epoch": 12,
+  "notes": "InfoNCE on frozen paper-layout ResNet-18, 64-d"
+}

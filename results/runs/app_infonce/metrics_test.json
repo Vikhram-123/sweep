@@ -1,0 +1,8 @@
+{
+  "name": "app_infonce",
+  "split": "test",
+  "compat_auc": 0.9212178412683119,
+  "fitb_acc": 0.6811488940244305,
+  "best_epoch": 1,
+  "notes": "Model A trained with InfoNCE (in-batch same-category negatives, learned temperature)"
+}

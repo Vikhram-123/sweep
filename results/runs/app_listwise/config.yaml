@@ -1,0 +1,25 @@
+name: app_listwise
+model: outfit
+projection_model: pairwise
+loss: listwise
+pool: mean
+infonce_weight: 0.0
+notes: listwise FITB loss, 16 candidates, mean pooling
+seed: 0
+device: cpu
+encoder: fashionclip
+hidden: 256
+out_dim: 128
+dropout: 0.1
+normalize: true
+n_neg: 15
+attn_dim: 32
+n_subspaces: 5
+temperature_init: 0.07
+margin: 0.2
+lr: 0.001
+weight_decay: 0.0001
+batch_size: 256
+pair_batch_size: 512
+max_epochs: 50
+patience: 5

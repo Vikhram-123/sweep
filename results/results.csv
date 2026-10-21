@@ -16,6 +16,7 @@ model_a_clip,ours,CLIP ViT-B/32 (frozen),3,0.9110399259259259,0.6434444444444444
 model_a_resnet18,ours,ResNet-18 ImageNet (frozen),3,0.828509111111111,0.5127777777777778,0.8014928876333297,0.0010654319482079418,0.4946627049631342,0.0040197862478409405,Model A on frozen ImageNet ResNet-18 features
 method_a_tv_resnet18,ours,"torchvision ResNet-18, 224 px (frozen)",3,0.8309420740740739,0.5139999999999999,0.8040371366290344,0.0021584434925698698,0.49655551887311544,0.004025205456136088,Model A (64-d) on frozen torchvision ResNet-18 (tv_resnet18)
 method_a_tv_resnet18_paper,ours,"torchvision ResNet-18, paper layout 112 px / layer3 (frozen)",3,0.8518437037037035,0.547888888888889,0.8217521124707593,0.0024271441934499813,0.5222625729063498,0.00347470819797349,Model A (64-d) on frozen torchvision ResNet-18 (tv_resnet18_paper)
+method_infonce,ours,"torchvision ResNet-18, paper layout 112 px / layer3 (frozen)",3,0.8850394074074074,0.5877777777777778,0.8468202889474233,0.004157603158600496,0.5605150214592275,0.0010809313663747125,"InfoNCE on frozen paper-layout ResNet-18, 64-d"
 model_a_neg_hard,ours,FashionCLIP (frozen),3,0.734676611111111,0.39855555555555555,0.7193670633274915,0.026981509576338474,0.3785187630681193,0.03501499604824862,"Model A, batch hardest mined negatives"
 model_a_neg_knn,ours,FashionCLIP (frozen),3,0.7517927222222222,0.5383333333333333,0.7352405685649847,0.010339520277971536,0.5280950808847805,0.006789375649615438,"Model A, negatives from the positive's 50 nearest same-type neighbours (cos <= 0.95)"
 model_a_neg_knn50,ours,FashionCLIP (frozen),3,0.9110964444444444,0.665888888888889,0.8883073403306572,0.0019324423978107244,0.6413777924507538,0.000973405717508296,"Model A, half kNN negatives, half random same-type"
@@ -27,6 +28,7 @@ model_a_text_only,ours,FashionCLIP text (frozen),3,0.8339137037037037,0.50644444
 combined,ours,FashionCLIP (frozen) + title text (concat),3,0.945421,0.7040000000000001,0.9277423830378461,0.0011573483348682563,0.6895785187630681,0.004424066524662368,"Model A + title text (concat) + sweep winner (out_dim 256, dropout 0.2)"
 transformer,ours,FashionCLIP (frozen),3,0.913329,0.605,0.8922472204150459,0.0027021731409892073,0.5870144161989655,0.004092872742328146,"outfit transformer, image-only inputs"
 transformer_text,ours,FashionCLIP (frozen) + title text (concat),3,0.9224040370370371,0.6041111111111112,0.9039166331783478,0.0015871069079293483,0.5887751733245296,0.003995126974554187,"outfit transformer, image + title text (concat) inputs"
+app_infonce,ours,FashionCLIP (frozen),3,0.9428953703703703,0.7011111111111111,0.9214054957464658,0.0011600752756265645,0.6819852536590734,0.002548159901117008,"Model A trained with InfoNCE (in-batch same-category negatives, learned temperature)"
 Bi-LSTM + VSE (Han et al. 2017),published,ResNet-18 (fine-tuned) + text,,,,0.62,,0.394,,"Vasileva et al. 2018, Table 5"
 SiameseNet,published,ResNet-18 (fine-tuned),,,,0.81,,0.518,,"Vasileva et al. 2018, Table 5"
 Type-aware CSN T1:1,published,ResNet-18 (fine-tuned),,,,0.82,,0.525,,"Vasileva et al. 2018, Table 5"

@@ -38,6 +38,7 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 |---|---|---|---|---|---|---|---|
 | method_a_tv_resnet18 | torchvision ResNet-18, 224 px (frozen) | 3 | 0.831 | 51.4% | 0.804 ± 0.002 | 49.7% ± 0.4 | Model A (64-d) on frozen torchvision ResNet-18 (tv_resnet18) |
 | method_a_tv_resnet18_paper | torchvision ResNet-18, paper layout 112 px / layer3 (frozen) | 3 | 0.852 | 54.8% | 0.822 ± 0.002 | 52.2% ± 0.3 | Model A (64-d) on frozen torchvision ResNet-18 (tv_resnet18_paper) |
+| method_infonce | torchvision ResNet-18, paper layout 112 px / layer3 (frozen) | 3 | 0.885 | 58.8% | 0.847 ± 0.004 | 56.1% ± 0.1 | InfoNCE on frozen paper-layout ResNet-18, 64-d |
 
 **Hard negatives (Model A, FashionCLIP)**
 
@@ -74,6 +75,12 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 |---|---|---|---|---|---|---|---|
 | transformer | FashionCLIP (frozen) | 3 | 0.913 | 60.5% | 0.892 ± 0.003 | 58.7% ± 0.4 | outfit transformer, image-only inputs |
 | transformer_text | FashionCLIP (frozen) + title text (concat) | 3 | 0.922 | 60.4% | 0.904 ± 0.002 | 58.9% ± 0.4 | outfit transformer, image + title text (concat) inputs |
+
+**Other**
+
+| model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |
+|---|---|---|---|---|---|---|---|
+| app_infonce | FashionCLIP (frozen) | 3 | 0.943 | 70.1% | 0.921 ± 0.001 | 68.2% ± 0.3 | Model A trained with InfoNCE (in-batch same-category negatives, learned temperature) |
 
 **Published (Polyvore Outfits disjoint)**
 

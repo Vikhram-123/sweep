@@ -22,3 +22,14 @@ fine-tuned, a handicap relative to every published row (they train ResNet-18 end
 
 **Chosen on validation: the paper layout** (112 px, layer4 dropped). It is also the layout the papers fine-tune, so Phase 3 compares like with like. Layer-3 features (mid-level: texture, color, pattern) carry more compatibility signal than layer-4's object-category features, which are tuned to tell ImageNet classes apart, not styles.
 
+
+## Step 1 — InfoNCE vs triplet (frozen paper-layout ResNet-18, 64-d)
+
+| model | seeds | val AUC | val FITB | **test AUC** | **test FITB** |
+|---|---|---|---|---|---|
+| triplet (Model A) | 3 | 0.852 | 54.8% | 0.822 ± 0.002 | 52.2% ± 0.3 |
+| **InfoNCE**, in-batch same-category negatives, learned τ | 3 | 0.885 | 58.8% | 0.847 ± 0.004 | 56.1% ± 0.1 |
+
+InfoNCE helps a lot on ResNet-18: +0.033 validation AUC, and test 0.847 / 56.1% (vs 0.822 / 52.2%).
+It now beats SiameseNet (0.81/51.8) and CSN (0.82/52.5) with a frozen backbone. Learned temperature
+τ ≈ 0.25: weaker features → a softer softmax over candidates. Best epochs 12–18.

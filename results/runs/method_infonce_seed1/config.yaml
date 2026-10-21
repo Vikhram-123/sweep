@@ -1,0 +1,19 @@
+name: method_infonce_seed1
+model: pairwise
+loss: infonce
+notes: InfoNCE on frozen paper-layout ResNet-18, 64-d
+seed: 1
+device: cpu
+encoder: tv_resnet18_paper
+hidden: 256
+out_dim: 64
+dropout: 0.1
+normalize: true
+temperature_init: 0.07
+learn_temperature: true
+margin: 0.2
+lr: 0.001
+weight_decay: 0.0001
+batch_size: 512
+max_epochs: 50
+patience: 5
