@@ -127,8 +127,8 @@ Data, either way:
 ```bash
 # (a) download on the cluster (asks for the HF token without echoing it)
 read -s -p "HF token: " HF_TOKEN && export HF_TOKEN && python -m compat.download --out data/polyvore; unset HF_TOKEN
-# (b) or copy from your Mac. --no-times gives files fresh timestamps so the 75-day purge doesn't
-#     delete them immediately (the parquet files keep their 2026 download dates otherwise)
+# (b) or copy from your Mac. --no-times gives the copies fresh timestamps, so the 75-day purge clock
+#     starts at the copy rather than at the original download date
 rsync -a --no-times ~/Downloads/Projects/Sweep/data/polyvore/ <netid>@dcc-login.oit.duke.edu:/work/<netid>/sweep/data/polyvore/
 ```
 
