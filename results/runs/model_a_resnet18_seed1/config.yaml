@@ -1,0 +1,16 @@
+name: model_a_resnet18_seed1
+model: pairwise
+notes: Model A on frozen ImageNet ResNet-18 features
+seed: 1
+device: cpu
+hidden: 256
+out_dim: 128
+dropout: 0.1
+normalize: true
+margin: 0.2
+lr: 0.001
+weight_decay: 0.0001
+batch_size: 512
+max_epochs: 50
+patience: 5
+encoder: resnet18

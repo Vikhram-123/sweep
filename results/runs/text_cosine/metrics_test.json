@@ -1,0 +1,8 @@
+{
+  "name": "text_cosine",
+  "split": "test",
+  "compat_auc": 0.6565114447214944,
+  "fitb_acc": 0.41723341036645756,
+  "eval_seconds": 2.0,
+  "notes": "mean pairwise cosine of frozen text embeddings"
+}

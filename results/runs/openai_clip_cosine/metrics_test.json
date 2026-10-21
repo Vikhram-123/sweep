@@ -1,0 +1,8 @@
+{
+  "name": "openai_clip_cosine",
+  "split": "test",
+  "compat_auc": 0.6381592182360436,
+  "fitb_acc": 0.41987454605480357,
+  "eval_seconds": 2.1,
+  "notes": "mean pairwise cosine of frozen clip embeddings"
+}

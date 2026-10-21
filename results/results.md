@@ -7,9 +7,12 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 | model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |
 |---|---|---|---|---|---|---|---|
 | fashionclip_cosine | FashionCLIP (frozen) | 1 |  |  | 0.753 | 52.4% | mean pairwise cosine of frozen fashionclip embeddings |
+| openai_clip_cosine | CLIP ViT-B/32 (frozen) | 1 |  |  | 0.638 | 42.0% | mean pairwise cosine of frozen clip embeddings |
 | random | — | 1 |  |  | 0.502 | 24.6% |  |
+| resnet18_cosine | ResNet-18 ImageNet (frozen) | 1 |  |  | 0.581 | 33.5% | mean pairwise cosine of frozen resnet18 embeddings |
 | rules | color tags + FashionCLIP zero-shot | 1 |  |  | 0.505 | 23.7% |  |
 | rules_clothing | color tags + FashionCLIP zero-shot | 1 |  |  | 0.512 | 24.3% |  |
+| text_cosine | FashionCLIP text (frozen) | 1 |  |  | 0.657 | 41.7% | mean pairwise cosine of frozen text embeddings |
 
 **Model A / Model B (FashionCLIP)**
 
@@ -19,6 +22,13 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 | model_b | FashionCLIP (frozen) | 3 | 0.934 | 68.1% | 0.911 ± 0.003 | 66.5% ± 0.3 | Model A + learned diagonal mask per type pair (66 pairs), masks init to 1 |
 | model_b_full | FashionCLIP (frozen) | 3 | 0.919 | 66.4% | 0.894 ± 0.002 | 64.0% ± 0.6 | Model B with a full 128x128 projection per type pair (paper Table 7b ablation) |
 | model_b_masklr10 | FashionCLIP (frozen) | 3 | 0.934 | 68.1% | 0.913 ± 0.002 | 66.8% ± 0.3 | Model B, masks at 10x learning rate and no weight decay |
+
+**Encoder ablation (Model A, identical config)**
+
+| model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |
+|---|---|---|---|---|---|---|---|
+| model_a_clip | CLIP ViT-B/32 (frozen) | 3 | 0.911 | 64.3% | 0.886 ± 0.001 | 61.9% ± 0.2 | Model A on frozen OpenAI CLIP ViT-B/32 features |
+| model_a_resnet18 | ResNet-18 ImageNet (frozen) | 3 | 0.829 | 51.3% | 0.801 ± 0.001 | 49.5% ± 0.4 | Model A on frozen ImageNet ResNet-18 features |
 
 **Published (Polyvore Outfits disjoint)**
 

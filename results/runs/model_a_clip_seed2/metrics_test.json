@@ -1,0 +1,8 @@
+{
+  "name": "model_a_clip_seed2",
+  "split": "test",
+  "compat_auc": 0.8863587565168705,
+  "fitb_acc": 0.6173654671508749,
+  "best_epoch": 11,
+  "notes": "Model A on frozen OpenAI CLIP ViT-B/32 features"
+}

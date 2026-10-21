@@ -1,0 +1,8 @@
+{
+  "name": "model_a_resnet18_seed2",
+  "split": "test",
+  "compat_auc": 0.8005191980983648,
+  "fitb_acc": 0.49019478375701553,
+  "best_epoch": 9,
+  "notes": "Model A on frozen ImageNet ResNet-18 features"
+}

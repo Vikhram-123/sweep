@@ -1,0 +1,8 @@
+{
+  "name": "resnet18_cosine",
+  "split": "test",
+  "compat_auc": 0.5805271960571307,
+  "fitb_acc": 0.33489600528227137,
+  "eval_seconds": 2.1,
+  "notes": "mean pairwise cosine of frozen resnet18 embeddings"
+}

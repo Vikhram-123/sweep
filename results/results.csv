@@ -1,12 +1,17 @@
 model,source,encoder,seeds,val_auc,val_fitb,compat_auc,compat_auc_std,fitb_acc,fitb_acc_std,notes
 fashionclip_cosine,ours,FashionCLIP (frozen),1,,,0.752866904178503,,0.5239352921756355,,mean pairwise cosine of frozen fashionclip embeddings
+openai_clip_cosine,ours,CLIP ViT-B/32 (frozen),1,,,0.6381592182360436,,0.41987454605480357,,mean pairwise cosine of frozen clip embeddings
 random,ours,—,1,,,0.5024182936794217,,0.24641795972268074,,
+resnet18_cosine,ours,ResNet-18 ImageNet (frozen),1,,,0.5805271960571307,,0.33489600528227137,,mean pairwise cosine of frozen resnet18 embeddings
 rules,ours,color tags + FashionCLIP zero-shot,1,,,0.5049571932636217,,0.2365137008913833,,
 rules_clothing,ours,color tags + FashionCLIP zero-shot,1,,,0.5116769413224709,,0.24311654011224826,,
+text_cosine,ours,FashionCLIP text (frozen),1,,,0.6565114447214944,,0.41723341036645756,,mean pairwise cosine of frozen text embeddings
 model_a,ours,FashionCLIP (frozen),3,0.9356975925925926,0.6865555555555556,0.9149270757571347,0.0008018083141193735,0.6704302850225597,0.0035858544037708526,"MLP 512-256-128 on frozen FashionCLIP, triplet loss, same-type negatives"
 model_b,ours,FashionCLIP (frozen),3,0.9337595555555556,0.6812222222222223,0.9111812095708252,0.00286284743875449,0.6645097391878507,0.002823051611281827,"Model A + learned diagonal mask per type pair (66 pairs), masks init to 1"
 model_b_full,ours,FashionCLIP (frozen),3,0.9186388148148148,0.6642222222222222,0.8941562802014772,0.0019155928560500354,0.6397711015736767,0.006371768357739392,Model B with a full 128x128 projection per type pair (paper Table 7b ablation)
 model_b_masklr10,ours,FashionCLIP (frozen),3,0.9336128703703704,0.6805555555555555,0.9130256244585965,0.0018156142687532593,0.6678111587982832,0.0033752071097080598,"Model B, masks at 10x learning rate and no weight decay"
+model_a_clip,ours,CLIP ViT-B/32 (frozen),3,0.9110399259259259,0.6434444444444444,0.8860341826813857,0.0008763272694517964,0.6193243094530648,0.001749856208676188,Model A on frozen OpenAI CLIP ViT-B/32 features
+model_a_resnet18,ours,ResNet-18 ImageNet (frozen),3,0.828509111111111,0.5127777777777778,0.8014928876333297,0.0010654319482079418,0.4946627049631342,0.0040197862478409405,Model A on frozen ImageNet ResNet-18 features
 Bi-LSTM + VSE (Han et al. 2017),published,ResNet-18 (fine-tuned) + text,,,,0.62,,0.394,,"Vasileva et al. 2018, Table 5"
 SiameseNet,published,ResNet-18 (fine-tuned),,,,0.81,,0.518,,"Vasileva et al. 2018, Table 5"
 Type-aware CSN T1:1,published,ResNet-18 (fine-tuned),,,,0.82,,0.525,,"Vasileva et al. 2018, Table 5"
