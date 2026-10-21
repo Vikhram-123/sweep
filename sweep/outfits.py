@@ -5,6 +5,10 @@ rule adds/subtracts points and leaves a short reason, so the UI can explain
 why an outfit was picked. Feedback (thumbs up/down) nudges scores through
 item-pair affinities, so liking one outfit also lifts outfits that share
 pairs with it.
+
+Visual harmony comes from one of two scorers: the hand-written color/pattern/contrast rules
+("rules"), or the learned compatibility model in sweep/compat.py ("model"). Occasion, weather,
+formality and feedback rules apply either way.
 """
 
 from __future__ import annotations
@@ -17,6 +21,7 @@ from dataclasses import dataclass, field
 import numpy as np
 
 from .colors import hue_deg
+from .compat import CompatModel, load_default
 
 # Target mean formality (1-5) per occasion.
 OCCASIONS: dict[str, float] = {
@@ -64,6 +69,40 @@ def outfit_warmth(items: list[dict]) -> float:
     return float(w)
 
 
+def _label(it: dict) -> str:
+    return f"{it['color']['name']} {it['subtype']}"
+
+
+class ModelHarmony:
+    """Learned visual compatibility for a closet: each item is mapped into the model's space once,
+    so scoring an outfit is just pairwise distances."""
+
+    def __init__(self, model: CompatModel, embeddings: dict[str, np.ndarray]):
+        self.model = model
+        ids = [i for i, v in embeddings.items() if v is not None]
+        z = model.embed(np.stack([embeddings[i] for i in ids])) if ids else np.zeros((0, 1))
+        self.z = dict(zip(ids, z))
+
+    def score(self, items: list[dict]) -> tuple[float, list[tuple[float, str]]]:
+        its = [it for it in items if it["id"] in self.z]
+        if len(its) < 2:
+            return 0.0, []
+        pairs = [(float(np.linalg.norm(self.z[a["id"]] - self.z[b["id"]])), a, b)
+                 for a, b in itertools.combinations(its, 2)]
+        term = self.model.calibrated(-float(np.mean([d for d, _, _ in pairs])))
+        notes = []
+        if term >= 0.15:
+            notes.append((term, "pieces look like they belong together"))
+        elif term <= -0.15:
+            notes.append((term, "pieces don't quite go together"))
+        best, worst = min(pairs, key=lambda p: p[0]), max(pairs, key=lambda p: p[0])
+        if len(pairs) > 1 and best[0] < worst[0]:
+            notes.append((0.1, f"{_label(best[1])} and {_label(best[2])} pair especially well"))
+            if term < 0:
+                notes.append((-0.2, f"{_label(worst[1])} is the odd one out with {_label(worst[2])}"))
+        return term, notes
+
+
 class FeedbackModel:
     """Votes -> pair affinities and exact-outfit scores."""
 
@@ -82,13 +121,7 @@ class FeedbackModel:
         return pair_term + FEEDBACK_EXACT * math.tanh(self.exact.get(frozenset(ids), 0.0))
 
 
-def score_outfit(items: list[dict], occasion: str | None = "casual", weather: str | None = "mild",
-                 feedback: FeedbackModel | None = None) -> tuple[float, list[tuple[float, str]], dict]:
-    """Return (score, [(delta, reason)], breakdown). occasion/weather None skips that rule."""
-    notes: list[tuple[float, str]] = []
-    br: dict[str, float] = {}
-    by = {it["category"]: it for it in items}
-
+def _rule_harmony(items: list[dict], by: dict, notes: list, br: dict) -> None:
     # --- color harmony -------------------------------------------------------
     color = 0.0
     accents = [it for it in items if not it["color"]["neutral"]]
@@ -146,6 +179,24 @@ def score_outfit(items: list[dict], occasion: str | None = "casual", weather: st
             notes.append((con, "top and bottom are similar but not matching"))
     br["contrast"] = con
 
+
+def score_outfit(items: list[dict], occasion: str | None = "casual", weather: str | None = "mild",
+                 feedback: FeedbackModel | None = None,
+                 harmony: ModelHarmony | None = None) -> tuple[float, list[tuple[float, str]], dict]:
+    """Return (score, [(delta, reason)], breakdown). occasion/weather None skips that rule.
+
+    With `harmony`, the learned model replaces the color, pattern and contrast rules.
+    """
+    notes: list[tuple[float, str]] = []
+    br: dict[str, float] = {}
+    by = {it["category"]: it for it in items}
+
+    if harmony is not None:
+        br["model"], model_notes = harmony.score(items)
+        notes.extend(model_notes)
+    else:
+        _rule_harmony(items, by, notes, br)
+
     # --- formality -----------------------------------------------------------------
     f = np.array([it["formality"] for it in items], float)
     spread = float(f.max() - f.min())
@@ -199,9 +250,25 @@ def generate_outfits(
     allow_outerwear: bool = True,
     beam: int = 400,
     diversity: float = 0.35,
+    scorer: str = "rules",
+    embeddings: dict[str, np.ndarray] | None = None,
+    model: CompatModel | None = None,
 ) -> list[Outfit]:
-    """Top-n diverse outfits for the occasion/weather."""
+    """Top-n diverse outfits for the occasion/weather.
+
+    scorer="model" scores visual harmony with the learned compatibility model; it needs each
+    item's FashionCLIP embedding (`embeddings`, id -> vector) and uses the bundled weights unless
+    `model` is given.
+    """
     fb = FeedbackModel(feedback)
+    harmony = None
+    if scorer == "model":
+        model = model or load_default()
+        if model is None or not embeddings:
+            raise ValueError("model scorer needs sweep/compat_model.npz and item embeddings")
+        harmony = ModelHarmony(model, embeddings)
+    elif scorer != "rules":
+        raise ValueError(f"unknown scorer {scorer!r}")
     must = next((it for it in items if it["id"] == must_include), None) if must_include else None
     pool = defaultdict(list)
     for it in items:
@@ -214,7 +281,7 @@ def generate_outfits(
             pool["dress"] = []
 
     def partial_score(combo):
-        return score_outfit(combo, occasion, None, fb)[0]
+        return score_outfit(combo, occasion, None, fb, harmony)[0]
 
     def prune(combos):
         combos.sort(key=partial_score, reverse=True)
@@ -231,7 +298,7 @@ def generate_outfits(
 
     scored = []
     for combo in full:
-        s, notes, br = score_outfit(combo, occasion, weather, fb)
+        s, notes, br = score_outfit(combo, occasion, weather, fb, harmony)
         scored.append(Outfit(items=combo, score=s, reasons=_reasons(notes), breakdown=br))
     scored.sort(key=lambda o: o.score, reverse=True)
 

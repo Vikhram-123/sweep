@@ -19,6 +19,7 @@ import streamlit as st
 
 from sweep.closet import Closet
 from sweep.colors import NAMED_COLORS, describe_name
+from sweep.compat import load_default as load_compat_model
 from sweep.outfits import OCCASIONS, WEATHER, generate_outfits
 from sweep.taxonomy import CATEGORIES, PATTERNS, SUBTYPES, subtype_attrs
 
@@ -250,18 +251,28 @@ def outfits_tab():
         return
     occasion = st.segmented_control("Occasion", list(OCCASIONS), default="casual", key="occasion") or "casual"
     weather = st.segmented_control("Weather", list(WEATHER), default="mild", key="weather") or "mild"
+    ids_e, vecs = CLOSET.load_embeddings()
+    embeddings = dict(zip(ids_e, vecs))
+    model_ok = load_compat_model() is not None and any(it["id"] in embeddings for it in items)
+    scorer = st.segmented_control(
+        "Style scoring", ["model", "rules"] if model_ok else ["rules"], key="scorer",
+        default="model" if model_ok else "rules",
+        format_func=lambda s: {"model": "Learned model", "rules": "Color rules"}[s],
+        help="Learned model: trained on 17k Polyvore outfits to judge which pieces go together. "
+             "Color rules: the hand-written color/pattern/contrast rules. Occasion and weather apply to both.",
+    ) or "rules"
     by_id = {it["id"]: it for it in items}
     must = st.selectbox("Must include", [None] + [it["id"] for it in items], key="must",
                         format_func=lambda i: "Anything" if i is None else item_label(by_id[i]))
     n = st.slider("How many", 3, 10, 5, key="n_outfits")
 
     feedback = CLOSET.load_feedback()
-    params = (occasion, weather, must, n, len(items), CLOSET.items_path.stat().st_mtime)
+    params = (occasion, weather, scorer, must, n, len(items), CLOSET.items_path.stat().st_mtime)
     if st.session_state.get("outfit_params") != params or st.button("Shuffle again", icon="🔄"):
         # Votes from this batch count immediately; later regenerations use them.
         st.session_state.outfit_params = params
         st.session_state.outfits = generate_outfits(items, occasion, weather, n=n, must_include=must,
-                                                    feedback=feedback)
+                                                    feedback=feedback, scorer=scorer, embeddings=embeddings)
         st.session_state.voted = {}
     outs = st.session_state.get("outfits", [])
     if not outs:
@@ -278,11 +289,11 @@ def outfits_tab():
             c1, c2, c3 = st.columns([1, 1, 2])
             c3.caption(f"score {o.score:+.2f}" + ("  ·  saved 👍" if voted == 1 else "  ·  saved 👎" if voted == -1 else ""))
             if c1.button("👍", key=f"up_{idx}", disabled=voted is not None):
-                CLOSET.add_feedback(o.ids, +1, {"occasion": occasion, "weather": weather})
+                CLOSET.add_feedback(o.ids, +1, {"occasion": occasion, "weather": weather, "scorer": scorer})
                 st.session_state.voted[key] = 1
                 st.rerun()
             if c2.button("👎", key=f"down_{idx}", disabled=voted is not None):
-                CLOSET.add_feedback(o.ids, -1, {"occasion": occasion, "weather": weather})
+                CLOSET.add_feedback(o.ids, -1, {"occasion": occasion, "weather": weather, "scorer": scorer})
                 st.session_state.voted[key] = -1
                 st.rerun()
 
