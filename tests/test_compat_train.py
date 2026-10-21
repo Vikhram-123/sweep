@@ -91,3 +91,63 @@ def test_transformer_is_order_invariant_and_ignores_padding():
     t = bank.types.numpy()
     assert (t[full] == t[outfit]).all() and (t[single] == t[outfit]).all()
     assert (single != outfit).sum() <= 1
+
+
+def _toy_split_and_model(n_out=12):
+    from compat.models import PairwiseMLP
+    bank = toy_bank(n=60, d=8, n_types=3)
+    split = Split("test", {f"o{k}": [f"i{(5 * k + j) % 60}" for j in range(3 + k % 3)] for k in range(n_out)})
+    torch.manual_seed(0)
+    return bank, split, PairwiseMLP(in_dim=8, hidden=16, out_dim=8, dropout=0.0).eval()
+
+
+def test_mean_pooling_matches_the_pairwise_outfit_score():
+    from compat.outfit_train import pooled_distance
+    from compat.train import outfit_scores
+    bank, split, model = _toy_split_and_model()
+    outfits = list(split.outfits.values())
+    ref = outfit_scores(model, bank, outfits, "cpu")
+    for k, o in enumerate(outfits):
+        r = torch.tensor([[bank.index[i] for i in o]])
+        L = r.shape[1]
+        mask = (~torch.eye(L, dtype=torch.bool))[None]
+        with torch.no_grad():
+            d = pooled_distance(model, None, bank, r, r, mask, "cpu")
+        assert -d.mean().item() == pytest.approx(ref[k], abs=1e-5)
+
+
+def test_attention_weights_are_a_distribution_over_valid_context():
+    from compat.outfit_train import AttentionPool
+    torch.manual_seed(0)
+    pool = AttentionPool(emb_dim=8, n_types=3, d=4)
+    gq, gk = torch.randn(2, 3, 8), torch.randn(2, 5, 8)
+    tq, tk = torch.randint(0, 3, (2, 3)), torch.randint(0, 3, (2, 5))
+    mask = torch.ones(2, 3, 5, dtype=torch.bool)
+    mask[:, :, 3:] = False  # last two context items are padding
+    w = pool(gq, tq, gk, tk, mask)
+    assert torch.allclose(w.sum(-1), torch.ones(2, 3))
+    assert (w[:, :, 3:] == 0).all()
+
+
+def test_holdout_sampler_targets_and_negatives():
+    from compat.outfit_train import HoldoutSampler
+    bank, split, _ = _toy_split_and_model()
+    s = HoldoutSampler(split, bank, n_neg=4)
+    assert len(s) == sum(len(o) for o in split.outfits.values())
+    t = bank.types.numpy()
+    for ctx, cmask, cand in s.batches(np.random.default_rng(0), 7):
+        for b in range(len(ctx)):
+            target = int(cand[b, 0])
+            context = ctx[b][cmask[b]].tolist()
+            assert target not in context
+            assert (t[cand[b].numpy()] == t[target]).all()   # negatives share the target's type
+            assert (cand[b, 1:] != target).all()
+
+
+def test_outfit_rank_semi_hard():
+    from compat.outfit_train import outfit_loss
+    D = torch.tensor([[0.5, 0.4, 0.6, 0.9],    # semi-hard negative = 0.6 -> loss 0.5 - 0.6 + 0.2 = 0.1
+                      [0.5, 0.1, 0.2, 0.3]])   # none farther than positive -> hardest 0.1 -> 0.5 - 0.1 + 0.2
+    assert outfit_loss(D, "outfit_rank", torch.tensor(1.0), 0.2).item() == pytest.approx((0.1 + 0.6) / 2)
+    ce = torch.nn.functional.cross_entropy(-D * 10, torch.zeros(2, dtype=torch.long))
+    assert outfit_loss(D, "listwise", torch.tensor(10.0), 0.2).item() == pytest.approx(ce.item())

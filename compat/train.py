@@ -359,7 +359,10 @@ def main(argv=None) -> None:
     for kv in args.set:
         k, v = kv.split("=", 1)
         cfg[k] = yaml.safe_load(v)
-    if cfg["model"] == "transformer":
+    if cfg["model"] == "outfit":
+        from .outfit_train import train_outfit_model
+        train_outfit_model(cfg)
+    elif cfg["model"] == "transformer":
         from .transformer import train_transformer
         train_transformer(cfg)
     else:

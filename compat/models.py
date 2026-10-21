@@ -74,7 +74,37 @@ class TypeAwareMLP(nn.Module):
         return F.normalize(z, dim=-1) if self.normalize else z
 
 
+class CSAMLP(nn.Module):
+    """Model C, after CSA-Net (Lin et al. 2020): a shared general embedding x, k shared learnable
+    masks, and per-category-pair attention weights over them:
+        w = softmax(MLP([onehot(own_type), onehot(other_type)]))      (k weights)
+        z = normalize( sum_i w_i * (x * m_i) )
+    Unlike Model B's one mask per type pair, all pairs share the same k subspaces and only learn how
+    to mix them, so rare pairs borrow strength from common ones.
+    """
+
+    def __init__(self, n_types: int, in_dim: int = 512, hidden: int = 256, out_dim: int = 128,
+                 dropout: float = 0.1, normalize: bool = True, n_subspaces: int = 5, **_):
+        super().__init__()
+        self.net = nn.Sequential(nn.Linear(in_dim, hidden), nn.ReLU(), nn.Dropout(dropout),
+                                 nn.Linear(hidden, out_dim))
+        self.normalize = normalize
+        self.n_types = n_types
+        # Masks start near 1 (slightly perturbed so the subspaces can differentiate).
+        self.masks = nn.Parameter(1.0 + 0.1 * torch.randn(n_subspaces, out_dim))
+        self.attn = nn.Sequential(nn.Linear(2 * n_types, 64), nn.ReLU(), nn.Linear(64, n_subspaces))
+
+    def forward(self, x: torch.Tensor, own_type: torch.Tensor, other_type: torch.Tensor) -> torch.Tensor:
+        g = self.net(x)
+        c = torch.cat([F.one_hot(own_type, self.n_types), F.one_hot(other_type, self.n_types)], -1).float()
+        w = torch.softmax(self.attn(c), dim=-1)                       # (B, k)
+        z = torch.einsum("bk,kd,bd->bd", w, self.masks, g)              # sum_i w_i (g * m_i)
+        return F.normalize(z, dim=-1) if self.normalize else z
+
+
 def build_model(cfg: dict, n_types: int) -> nn.Module:
+    if cfg["model"] == "csa":
+        return CSAMLP(n_types=n_types, **cfg)
     if cfg["model"] == "pairwise":
         return PairwiseMLP(**cfg)
     if cfg["model"] == "type_aware":
