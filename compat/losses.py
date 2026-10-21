@@ -45,4 +45,8 @@ def info_nce_loss(anchor: torch.Tensor, positive: torch.Tensor, valid_neg: torch
     Returns the mean over the batch of the cross-entropy of picking positive[i] for anchor i among
     {positive[i]} + its valid negatives.
     """
-    raise NotImplementedError("your turn -- see the hints in the chat")
+    logits = logit_scale * anchor @ positive.T
+    keep = valid_neg | torch.eye(len(anchor), dtype=torch.bool, device=anchor.device)
+    logits = logits.masked_fill(~keep, float("-inf"))
+    targets = torch.arange(len(anchor), device=anchor.device)
+    return torch.nn.functional.cross_entropy(logits, targets)
