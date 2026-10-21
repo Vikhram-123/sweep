@@ -65,7 +65,12 @@ class TypeAwareMLP(nn.Module):
         if self.projection == "diagonal":
             z = g * self.masks[pair]
         else:
-            z = torch.bmm(self.mats[pair], g.unsqueeze(-1)).squeeze(-1)
+            # One matmul per type pair present. Gathering a matrix per row (bmm on mats[pair]) would
+            # allocate rows x 128 x 128 floats -- 4 GB for a 65k-pair evaluation chunk.
+            z = torch.empty_like(g)
+            for p in pair.unique():
+                rows = pair == p
+                z[rows] = g[rows] @ self.mats[p].T
         return F.normalize(z, dim=-1) if self.normalize else z
 
 

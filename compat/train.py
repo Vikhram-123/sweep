@@ -158,7 +158,15 @@ def train(cfg: dict) -> dict:
     train_split, valid, test = (load_split(s) for s in SPLITS)
     sampler = TripletSampler(train_split, bank)
     model = build_model(cfg, n_types=len(bank.type_names)).to(device)
-    opt = torch.optim.Adam(model.parameters(), lr=cfg["lr"], weight_decay=cfg["weight_decay"])
+    # Type-pair projections (Model B) can get their own learning rate and no weight decay
+    # (config proj_lr_mult); with one shared rate they barely move away from their init.
+    proj = [p for n, p in model.named_parameters() if n in ("masks", "mats")]
+    rest = [p for n, p in model.named_parameters() if n not in ("masks", "mats")]
+    groups = [{"params": rest}]
+    if proj:
+        groups.append({"params": proj, "lr": cfg["lr"] * cfg.get("proj_lr_mult", 1.0),
+                       "weight_decay": cfg["weight_decay"] if cfg.get("proj_lr_mult", 1.0) == 1.0 else 0.0})
+    opt = torch.optim.Adam(groups, lr=cfg["lr"], weight_decay=cfg["weight_decay"])
     print(f"{cfg['name']}: {sum(p.numel() for p in model.parameters()):,} params, "
           f"{len(sampler):,} triplets/epoch, device {device}", flush=True)
 

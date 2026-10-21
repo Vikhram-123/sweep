@@ -1,0 +1,8 @@
+{
+  "name": "model_b_masklr10",
+  "split": "test",
+  "compat_auc": 0.9149970315561873,
+  "fitb_acc": 0.6643116540112248,
+  "best_epoch": 10,
+  "notes": "Model B, masks at 10x learning rate and no weight decay"
+}
