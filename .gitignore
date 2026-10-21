@@ -6,3 +6,4 @@ closet/
 *.zip
 scripts/demo_data/
 .DS_Store
+data/
