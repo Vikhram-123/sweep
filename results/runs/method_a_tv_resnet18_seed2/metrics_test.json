@@ -1,0 +1,8 @@
+{
+  "name": "method_a_tv_resnet18_seed2",
+  "split": "test",
+  "compat_auc": 0.8063237804339063,
+  "fitb_acc": 0.49871244635193135,
+  "best_epoch": 12,
+  "notes": "Model A (64-d) on frozen torchvision ResNet-18 (tv_resnet18)"
+}

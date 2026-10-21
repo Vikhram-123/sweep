@@ -1,0 +1,8 @@
+{
+  "name": "tv_resnet18_paper_cosine",
+  "split": "test",
+  "compat_auc": 0.5877766339492967,
+  "fitb_acc": 0.36685374711125784,
+  "eval_seconds": 1.8,
+  "notes": "mean pairwise cosine of frozen tv_resnet18_paper embeddings"
+}

@@ -28,13 +28,16 @@ PUBLISHED = [
     ("OutfitTransformer (Sarkar et al. 2023)", "ResNet-18 (fine-tuned) + text", 0.88, 0.5948, "WACV 2023, Tables 1–2"),
 ]
 ENCODER_LABEL = {"fashionclip": "FashionCLIP (frozen)", "clip": "CLIP ViT-B/32 (frozen)",
-                 "resnet18": "ResNet-18 ImageNet (frozen)", "text": "FashionCLIP text (frozen)"}
+                 "resnet18": "ResNet-18 ImageNet (frozen)", "text": "FashionCLIP text (frozen)",
+                 "tv_resnet18": "torchvision ResNet-18, 224 px (frozen)",
+                 "tv_resnet18_paper": "torchvision ResNet-18, paper layout 112 px / layer3 (frozen)"}
 
 # (section title, regex on the pooled run name), in display order; first match wins.
 SECTIONS = [
     ("Baselines", r"^(random|rules|rules_clothing|\w+_cosine)$"),
     ("Model A / Model B (FashionCLIP)", r"^model_[ab](_masklr10|_full)?$"),
     ("Encoder ablation (Model A, identical config)", r"^model_a_(resnet18|clip)$"),
+    ("Method track: torchvision ResNet-18 (frozen)", r"^method_"),
     ("Hard negatives (Model A, FashionCLIP)", r"^model_a_neg_"),
     ("Squared vs plain distance (Model A, FashionCLIP)", r"^model_a_sq"),
     ("Image + title text (Model A, FashionCLIP)", r"^model_a_text_"),
@@ -48,7 +51,7 @@ def _encoder(run_dir: Path, name: str) -> str:
     cfg_path = run_dir / "config.yaml"
     if cfg_path.exists():
         cfg = yaml.safe_load(cfg_path.read_text())
-        enc = ENCODER_LABEL[cfg.get("encoder", "fashionclip")]
+        enc = ENCODER_LABEL.get(cfg.get("encoder", "fashionclip"), cfg.get("encoder"))
         feats = cfg.get("features", "image")
         return enc + ("" if feats == "image" else f" + title text ({feats})")
     enc = {"openai_clip_cosine": "clip"}.get(name, name.removesuffix("_cosine"))

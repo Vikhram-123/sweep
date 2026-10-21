@@ -13,6 +13,8 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 | rules | color tags + FashionCLIP zero-shot | 1 |  |  | 0.505 | 23.7% |  |
 | rules_clothing | color tags + FashionCLIP zero-shot | 1 |  |  | 0.512 | 24.3% |  |
 | text_cosine | FashionCLIP text (frozen) | 1 |  |  | 0.657 | 41.7% | mean pairwise cosine of frozen text embeddings |
+| tv_resnet18_cosine | torchvision ResNet-18, 224 px (frozen) | 1 |  |  | 0.577 | 33.2% | mean pairwise cosine of frozen tv_resnet18 embeddings |
+| tv_resnet18_paper_cosine | torchvision ResNet-18, paper layout 112 px / layer3 (frozen) | 1 |  |  | 0.588 | 36.7% | mean pairwise cosine of frozen tv_resnet18_paper embeddings |
 
 **Model A / Model B (FashionCLIP)**
 
@@ -29,6 +31,13 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 |---|---|---|---|---|---|---|---|
 | model_a_clip | CLIP ViT-B/32 (frozen) | 3 | 0.911 | 64.3% | 0.886 ± 0.001 | 61.9% ± 0.2 | Model A on frozen OpenAI CLIP ViT-B/32 features |
 | model_a_resnet18 | ResNet-18 ImageNet (frozen) | 3 | 0.829 | 51.3% | 0.801 ± 0.001 | 49.5% ± 0.4 | Model A on frozen ImageNet ResNet-18 features |
+
+**Method track: torchvision ResNet-18 (frozen)**
+
+| model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |
+|---|---|---|---|---|---|---|---|
+| method_a_tv_resnet18 | torchvision ResNet-18, 224 px (frozen) | 3 | 0.831 | 51.4% | 0.804 ± 0.002 | 49.7% ± 0.4 | Model A (64-d) on frozen torchvision ResNet-18 (tv_resnet18) |
+| method_a_tv_resnet18_paper | torchvision ResNet-18, paper layout 112 px / layer3 (frozen) | 3 | 0.852 | 54.8% | 0.822 ± 0.002 | 52.2% ± 0.3 | Model A (64-d) on frozen torchvision ResNet-18 (tv_resnet18_paper) |
 
 **Hard negatives (Model A, FashionCLIP)**
 

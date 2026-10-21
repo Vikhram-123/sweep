@@ -1,0 +1,8 @@
+{
+  "name": "tv_resnet18_cosine",
+  "split": "test",
+  "compat_auc": 0.5774026187483794,
+  "fitb_acc": 0.33225486959392536,
+  "eval_seconds": 2.0,
+  "notes": "mean pairwise cosine of frozen tv_resnet18 embeddings"
+}
