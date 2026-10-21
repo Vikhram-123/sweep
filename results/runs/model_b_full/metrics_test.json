@@ -1,0 +1,8 @@
+{
+  "name": "model_b_full",
+  "split": "test",
+  "compat_auc": 0.8919541101584213,
+  "fitb_acc": 0.639022779795312,
+  "best_epoch": 13,
+  "notes": "Model B with a full 128x128 projection per type pair (paper Table 7b ablation)"
+}

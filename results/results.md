@@ -17,6 +17,7 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 |---|---|---|---|---|---|---|---|
 | model_a | FashionCLIP (frozen) | 3 | 0.936 | 68.7% | 0.915 ± 0.001 | 67.0% ± 0.4 | MLP 512-256-128 on frozen FashionCLIP, triplet loss, same-type negatives |
 | model_b | FashionCLIP (frozen) | 3 | 0.934 | 68.1% | 0.911 ± 0.003 | 66.5% ± 0.3 | Model A + learned diagonal mask per type pair (66 pairs), masks init to 1 |
+| model_b_full | FashionCLIP (frozen) | 3 | 0.919 | 66.4% | 0.894 ± 0.002 | 64.0% ± 0.6 | Model B with a full 128x128 projection per type pair (paper Table 7b ablation) |
 | model_b_masklr10 | FashionCLIP (frozen) | 3 | 0.934 | 68.1% | 0.913 ± 0.002 | 66.8% ± 0.3 | Model B, masks at 10x learning rate and no weight decay |
 
 **Published (Polyvore Outfits disjoint)**
