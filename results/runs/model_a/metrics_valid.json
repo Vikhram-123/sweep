@@ -1,0 +1,8 @@
+{
+  "name": "model_a",
+  "split": "valid",
+  "compat_auc": 0.936661,
+  "fitb_acc": 0.685,
+  "best_epoch": 10,
+  "notes": ""
+}

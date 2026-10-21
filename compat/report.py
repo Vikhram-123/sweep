@@ -6,7 +6,10 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 from pathlib import Path
+
+import numpy as np
 
 from .evaluate import RUNS_DIR
 
@@ -17,20 +20,36 @@ PUBLISHED = [
     ("paper: type-aware CSN T1:1", "published", 0.82, 0.525),
     ("paper: type-aware CSN + VSE + Sim + Metric (512-D)", "published", 0.84, 0.552),
 ]
-ORDER = ["random", "rules", "rules_clothing", "clip_cosine"]
+ORDER = ["random", "rules", "rules_clothing", "clip_cosine", "model_a", "model_b"]
 
 
 def collect() -> list[dict]:
-    rows = []
+    """One row per model; runs named <model>_seed<N> are pooled as mean +- std over seeds."""
+    groups: dict[str, list[dict]] = {}
     for p in sorted(RUNS_DIR.glob("*/metrics_test.json")):
         m = json.loads(p.read_text())
-        rows.append({"model": m["name"], "source": "ours", "compat_auc": m["compat_auc"],
-                     "fitb_acc": m["fitb_acc"], "notes": m.get("notes", "")})
+        groups.setdefault(re.sub(r"_seed\d+$", "", m["name"]), []).append(m)
+    rows = []
+    for name, ms in groups.items():
+        auc, fitb = np.array([m["compat_auc"] for m in ms]), np.array([m["fitb_acc"] for m in ms])
+        rows.append({"model": name, "source": "ours", "seeds": len(ms),
+                     "compat_auc": auc.mean(), "compat_auc_std": auc.std(ddof=1) if len(ms) > 1 else None,
+                     "fitb_acc": fitb.mean(), "fitb_acc_std": fitb.std(ddof=1) if len(ms) > 1 else None,
+                     "notes": ms[0].get("notes", "")})
     rank = {n: i for i, n in enumerate(ORDER)}
     rows.sort(key=lambda r: (rank.get(r["model"], len(ORDER)), r["model"]))
-    rows += [{"model": n, "source": s, "compat_auc": a, "fitb_acc": f, "notes": "Vasileva et al. 2018, Table 5 (Polyvore Outfits-D)"}
+    rows += [{"model": n, "source": s, "seeds": None, "compat_auc": a, "compat_auc_std": None,
+              "fitb_acc": f, "fitb_acc_std": None, "notes": "Vasileva et al. 2018, Table 5 (Polyvore Outfits-D)"}
              for n, s, a, f in PUBLISHED]
     return rows
+
+
+def _fmt(mean: float, std: float | None, pct: bool = False) -> str:
+    k = 100 if pct else 1
+    body = f"{k * mean:.1f}%" if pct else f"{mean:.3f}"
+    if std is None:
+        return body
+    return body + (f" ± {k * std:.1f}" if pct else f" ± {std:.3f}")
 
 
 def main(out_dir: Path = Path("results")) -> None:
@@ -40,9 +59,10 @@ def main(out_dir: Path = Path("results")) -> None:
         w.writeheader()
         w.writerows(rows)
     lines = ["# Outfit compatibility — Polyvore Outfits, disjoint test set", "",
-             "| model | source | compat AUC | FITB acc | notes |", "|---|---|---|---|---|"]
-    lines += [f"| {r['model']} | {r['source']} | {r['compat_auc']:.3f} | {100 * r['fitb_acc']:.1f}% | {r['notes']} |"
-              for r in rows]
+             "Trained models: mean ± std over seeds (column *seeds*).", "",
+             "| model | source | seeds | compat AUC | FITB acc | notes |", "|---|---|---|---|---|---|"]
+    lines += [f"| {r['model']} | {r['source']} | {r['seeds'] or ''} | {_fmt(r['compat_auc'], r['compat_auc_std'])} "
+              f"| {_fmt(r['fitb_acc'], r['fitb_acc_std'], pct=True)} | {r['notes']} |" for r in rows]
     (out_dir / "results.md").write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
 

@@ -1,0 +1,8 @@
+{
+  "name": "model_a_seed2",
+  "split": "valid",
+  "compat_auc": 0.9344176666666667,
+  "fitb_acc": 0.6953333333333334,
+  "best_epoch": 9,
+  "notes": ""
+}

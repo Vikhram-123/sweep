@@ -1,0 +1,8 @@
+{
+  "name": "model_a_seed1",
+  "split": "test",
+  "compat_auc": 0.9146436935528364,
+  "fitb_acc": 0.67236711786068,
+  "best_epoch": 6,
+  "notes": "MLP 512-256-128 on frozen FashionCLIP, triplet loss, same-type negatives"
+}

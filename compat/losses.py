@@ -15,4 +15,6 @@ def triplet_loss(anchor: torch.Tensor, positive: torch.Tensor, negative: torch.T
 
     Returns a scalar tensor (the mean loss over the batch).
     """
-    raise NotImplementedError("your turn -- see the hints in the chat")
+    d_pos = (anchor - positive).norm(dim=-1)
+    d_neg = (anchor - negative).norm(dim=-1)
+    return torch.relu(d_pos - d_neg + margin).mean()

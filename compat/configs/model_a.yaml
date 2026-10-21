@@ -1,6 +1,7 @@
 # Model A: shared MLP on frozen FashionCLIP embeddings, outfit score = mean pairwise -distance.
 name: model_a
 model: pairwise          # pairwise (A) | type_aware (B)
+notes: MLP 512-256-128 on frozen FashionCLIP, triplet loss, same-type negatives
 seed: 0
 device: cpu              # the MLP is tiny; per-step MPS launch overhead outweighs the speedup
 
