@@ -59,6 +59,13 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 |---|---|---|---|---|---|---|---|
 | combined | FashionCLIP (frozen) + title text (concat) | 3 | 0.945 | 70.4% | 0.928 ± 0.001 | 69.0% ± 0.4 | Model A + title text (concat) + sweep winner (out_dim 256, dropout 0.2) |
 
+**Outfit transformer**
+
+| model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |
+|---|---|---|---|---|---|---|---|
+| transformer | FashionCLIP (frozen) | 3 | 0.913 | 60.5% | 0.892 ± 0.003 | 58.7% ± 0.4 | outfit transformer, image-only inputs |
+| transformer_text | FashionCLIP (frozen) + title text (concat) | 3 | 0.922 | 60.4% | 0.904 ± 0.002 | 58.9% ± 0.4 | outfit transformer, image + title text (concat) inputs |
+
 **Published (Polyvore Outfits disjoint)**
 
 | model | encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** | notes |

@@ -1,0 +1,8 @@
+{
+  "name": "transformer_text_seed2",
+  "split": "valid",
+  "compat_auc": 0.9199257777777777,
+  "fitb_acc": 0.5983333333333334,
+  "best_epoch": 46,
+  "notes": "outfit transformer, image + title text (concat) inputs"
+}

@@ -21,6 +21,8 @@ model_a_text_concat,ours,FashionCLIP (frozen) + title text (concat),3,0.94457477
 model_a_text_mean,ours,FashionCLIP (frozen) + title text (mean),3,0.9375350740740741,0.6861111111111112,0.9227480897670778,0.0025355501510846284,0.6798943545724662,0.0036207408044516614,"Model A, features=mean"
 model_a_text_only,ours,FashionCLIP text (frozen),3,0.8339137037037037,0.5064444444444445,0.818932828736033,0.001063766934613512,0.4955210740618466,0.004955796302056878,"Model A, encoder=text"
 combined,ours,FashionCLIP (frozen) + title text (concat),3,0.945421,0.7040000000000001,0.9277423830378461,0.0011573483348682563,0.6895785187630681,0.004424066524662368,"Model A + title text (concat) + sweep winner (out_dim 256, dropout 0.2)"
+transformer,ours,FashionCLIP (frozen),3,0.913329,0.605,0.8922472204150459,0.0027021731409892073,0.5870144161989655,0.004092872742328146,"outfit transformer, image-only inputs"
+transformer_text,ours,FashionCLIP (frozen) + title text (concat),3,0.9224040370370371,0.6041111111111112,0.9039166331783478,0.0015871069079293483,0.5887751733245296,0.003995126974554187,"outfit transformer, image + title text (concat) inputs"
 Bi-LSTM + VSE (Han et al. 2017),published,ResNet-18 (fine-tuned) + text,,,,0.62,,0.394,,"Vasileva et al. 2018, Table 5"
 SiameseNet,published,ResNet-18 (fine-tuned),,,,0.81,,0.518,,"Vasileva et al. 2018, Table 5"
 Type-aware CSN T1:1,published,ResNet-18 (fine-tuned),,,,0.82,,0.525,,"Vasileva et al. 2018, Table 5"

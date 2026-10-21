@@ -1,0 +1,8 @@
+{
+  "name": "transformer_seed2",
+  "split": "test",
+  "compat_auc": 0.8949584172630349,
+  "fitb_acc": 0.5885770881479035,
+  "best_epoch": 35,
+  "notes": "outfit transformer, image-only inputs"
+}

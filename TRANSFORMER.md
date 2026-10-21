@@ -26,8 +26,10 @@ every other item in the outfit before the final score is computed.
 
 Take an outfit of, say, 5 items. Each item already has a frozen 512-d FashionCLIP embedding.
 
-1. **Item tokens.** Each item's 512-d embedding goes through one linear layer, which shrinks it to
-   128 numbers. This is its "token", the same idea as a word token in a language model.
+1. **Item tokens.** Each item's embedding (512-d image, or 1024-d image + title text) goes through
+   one linear layer, which shrinks it to 128 numbers, followed by a LayerNorm. This is its "token",
+   the same idea as a word token in a language model. (Why the LayerNorm matters: see "A bug worth
+   telling" below.)
 
 2. **Type embeddings.** We add a learned 128-d vector for the item's category (tops, shoes, bags,
    ...; 11 types). This tells the model "this token is a shoe", the same way BERT adds a
@@ -89,6 +91,29 @@ Size: 349k parameters, about twice Model A (164k). It trains on CPU in seconds p
   then pick the highest. Unlike Model A, this lets the score depend on how the candidate interacts
   with the *combination* of context items.
 
+## Results (Polyvore Outfits disjoint, 3 seeds, selection on validation)
+
+| model | inputs | val AUC | val FITB | test AUC | test FITB |
+|---|---|---|---|---|---|
+| Model A (pairwise) | image | 0.936 | 68.7% | 0.915 ± 0.001 | 67.0% ± 0.4 |
+| Transformer | image | 0.913 | 60.5% | 0.892 ± 0.003 | 58.7% ± 0.4 |
+| Combined pairwise model | image + title text | **0.945** | **70.4%** | **0.928 ± 0.001** | **69.0% ± 0.4** |
+| Transformer | image + title text | 0.922 | 60.4% | 0.904 ± 0.002 | 58.9% ± 0.4 |
+
+**The pairwise models win, especially on FITB (−8 to −10 points for the transformer).** The
+transformer is still respectable on AUC: on the same frozen features it beats every published
+disjoint result except on FITB. Notes:
+
+- **FITB is where it loses most.** Model A's training examples *are* FITB comparisons: "is this
+  candidate closer to the anchor than that same-type alternative?", about 386k per epoch. The
+  transformer gets one real/fake label per outfit (about 34k per epoch), and only half of its fakes
+  differ by a single item. It sees far fewer of the fine-grained comparisons FITB tests.
+- **The text runs hit the 60-epoch cap** (best epochs 46–59, validation still creeping up by about
+  0.003 per 10 epochs), so they're slightly undertrained. The image-only runs early-stopped on their
+  own (best epochs 28–35). More epochs would not plausibly close a 0.023 validation-AUC gap at that
+  rate.
+- The caveats below turned out to describe what happened.
+
 ## Why it might *not* beat pairwise scoring (honest caveats)
 
 - **Data size.** 17k training outfits is small for attention. Pairwise models get roughly 20
@@ -99,6 +124,26 @@ Size: 349k parameters, about twice Model A (164k). It trains on CPU in seconds p
 - **The test negatives are easy.** Random same-type swaps usually produce obviously incoherent
   outfits, which pairwise averaging already catches. The transformer's advantage (context, the odd
   one out) matters most for *subtle* fakes, which this benchmark doesn't contain many of.
+
+## A bug worth telling: the first version sat at chance
+
+The first full training run had loss stuck at 0.693 (= ln 2, i.e. predicting 50/50 for everything)
+and validation AUC 0.50 for two epochs. How it was debugged:
+
+1. **Can it overfit a tiny set?** 256 real + 256 fake outfits, no dropout: yes, 100% training
+   accuracy. So the plumbing (masking, labels, gradients) was fine. The problem was optimisation,
+   not a bug in the data path.
+2. **Look at the scales.** At initialisation the item tokens had norm about **0.45**, because unit-norm
+   CLIP vectors through a default-initialised linear layer come out small. The type embeddings had
+   norm about **11** (`nn.Embedding` initialises from N(0, 1), so 128 dims give √128 ≈ 11). The
+   type embedding was 25× louder than the item signal, and it carries *no* information here:
+   fake outfits are built to have exactly the same types as real ones.
+3. **Fix:** a LayerNorm after the item projection, so item tokens also have norm about 11. The same
+   overfitting test then converges twice as fast, and the full run learns from the first epoch
+   (validation AUC 0.80 → 0.85 in three epochs instead of 0.50 → 0.50).
+
+The general lesson: when you add embeddings of different origins (here item + type; in BERT, token +
+position + segment), check that they're on comparable scales, or one will drown out the other.
 
 ## Interview questions you should be able to answer
 
@@ -114,5 +159,9 @@ Size: 349k parameters, about twice Model A (164k). It trains on CPU in seconds p
 4. *Why BCE here but triplet loss for Model A?* Model A learns a metric space between items (a
    relative, ranking objective). The transformer outputs one score per outfit, so it's a binary
    classification of real vs fake.
-5. *Why might a bigger model do worse here?* About 17k outfits is little data for attention; frozen
+5. *Your transformer trained at chance. How did you debug it?* First check whether it can overfit a
+   tiny set: it could, so the code path was fine. Then compare activation scales: item tokens
+   (norm 0.45) were drowned out by type embeddings (norm 11) that carry no real-vs-fake signal. A
+   LayerNorm after the item projection fixed it.
+6. *Why might a bigger model do worse here?* About 17k outfits is little data for attention; frozen
    inputs cap what it can learn; and easy negatives don't reward context-awareness.

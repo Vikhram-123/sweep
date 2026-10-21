@@ -1,0 +1,18 @@
+name: transformer
+model: transformer
+notes: outfit transformer, image-only inputs
+seed: 0
+device: cpu
+encoder: fashionclip
+features: image
+d_model: 128
+heads: 4
+layers: 2
+ff: 256
+dropout: 0.1
+single_swap_frac: 0.5
+lr: 0.0003
+weight_decay: 0.0001
+batch_size: 128
+max_epochs: 60
+patience: 8
