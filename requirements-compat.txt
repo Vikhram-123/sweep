@@ -1,0 +1,6 @@
+# Research-only extras for compat/ (training the outfit compatibility model). The app doesn't need these.
+-r requirements.txt
+huggingface_hub>=0.30   # dataset download (hf auth login for the gated repo)
+pyarrow>=15             # parquet with embedded item images
+pyyaml>=6               # run configs
+matplotlib>=3.8         # training curves

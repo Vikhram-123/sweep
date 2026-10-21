@@ -1,0 +1,18 @@
+# Model A: shared MLP on frozen FashionCLIP embeddings, outfit score = mean pairwise -distance.
+name: model_a
+model: pairwise          # pairwise (A) | type_aware (B)
+seed: 0
+device: cpu              # the MLP is tiny; per-step MPS launch overhead outweighs the speedup
+
+hidden: 256
+out_dim: 128
+dropout: 0.1
+normalize: true          # L2-normalise outputs, so distances live in [0, 2] and the margin has a fixed scale
+
+margin: 0.2
+lr: 0.001
+weight_decay: 0.0001
+batch_size: 512
+
+max_epochs: 50
+patience: 5              # stop after this many epochs without a better validation AUC
