@@ -35,3 +35,14 @@ to CLIP's 0.07). It peaks after 1–2 epochs, so it learns fast and then slowly 
 **Screening winner on validation: listwise + attention pooling** (+0.002 val AUC, +0.7 FITB over InfoNCE seed 0).
 The ranking matches the ResNet-18 track: listwise ≈ CSA + listwise > InfoNCE ≈ listwise + InfoNCE ≫ outfit ranking hinge.
 The margins here are within seed noise (±0.002). Seeds 1–2 of the winner follow.
+
+## Steps 2–4 — 3-seed confirmation of the winner
+
+| model | seeds | val AUC | val FITB | **test AUC** | **test FITB** |
+|---|---|---|---|---|---|
+| InfoNCE (step 1) | 3 | 0.943 | 70.1% | 0.921 ± 0.001 | 68.2% ± 0.3 |
+| **listwise + attention pooling** | 3 | 0.945 | 70.4% | 0.926 ± 0.003 | 69.3% ± 0.1 |
+
+Over 3 seeds, attention pooling **wins on validation on every seed** (val 0.945 / 70.4% vs 0.943 / 70.1%). The gain is small but holds on every seed.
+Test is 0.926 ± 0.003 / 69.3% ± 0.1, vs 0.921 / 68.2%. It peaks at epochs 5–6 (InfoNCE peaked at epochs 1–2), with τ ≈ 0.06.
+**Carried forward: listwise + attention.**

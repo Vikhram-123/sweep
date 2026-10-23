@@ -1,0 +1,8 @@
+{
+  "name": "app_listwise_attn_seed2",
+  "split": "valid",
+  "compat_auc": 0.9452204444444444,
+  "fitb_acc": 0.6966666666666667,
+  "best_epoch": 5,
+  "notes": "listwise loss, type-aware attention pooling"
+}

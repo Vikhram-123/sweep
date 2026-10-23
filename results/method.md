@@ -51,3 +51,16 @@ It now beats SiameseNet (0.81/51.8) and CSN (0.82/52.5) with a frozen backbone. 
 The listwise loss alone ties InfoNCE, and adding InfoNCE on top hurts. The outfit ranking hinge is clearly
 worse (−0.03 to −0.04 val AUC), with or without CSA subspaces. CSA subspaces with the listwise loss come close to plain listwise.
 The gaps between the top three rows are about the size of seed noise. Seeds 1–2 of the winner follow.
+
+## Steps 2–4 — 3-seed confirmation of the winner
+
+| model | seeds | val AUC | val FITB | **test AUC** | **test FITB** |
+|---|---|---|---|---|---|
+| InfoNCE (step 1) | 3 | 0.885 | 58.8% | 0.847 ± 0.004 | 56.1% ± 0.1 |
+| **listwise + attention pooling** | 3 | 0.887 | 59.0% | 0.855 ± 0.007 | 56.7% ± 0.5 |
+
+Over 3 seeds, attention pooling is a **tie with InfoNCE on validation** (+0.002 AUC, +0.2 FITB, within
+noise). Seed 0's +0.004 lead was mostly luck. Test is 0.855 ± 0.007 vs 0.847 ± 0.004, but test is not used for selection.
+The learned τ is lower (0.11 vs 0.25), because the listwise softmax runs over 16 candidates. Best epochs 11–25.
+**Carried forward: listwise + attention.** It's at least as good, and it is the outfit-level model the
+fine-tuning phase builds on. InfoNCE stays as a reference row.
