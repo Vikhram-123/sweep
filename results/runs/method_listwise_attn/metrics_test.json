@@ -1,0 +1,8 @@
+{
+  "name": "method_listwise_attn",
+  "split": "test",
+  "compat_auc": 0.8569459743226069,
+  "fitb_acc": 0.5714757345658633,
+  "best_epoch": 16,
+  "notes": "listwise loss, type-aware attention pooling"
+}

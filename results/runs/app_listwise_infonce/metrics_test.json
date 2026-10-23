@@ -1,0 +1,8 @@
+{
+  "name": "app_listwise_infonce",
+  "split": "test",
+  "compat_auc": 0.9213939533121065,
+  "fitb_acc": 0.6757345658633213,
+  "best_epoch": 3,
+  "notes": "listwise + InfoNCE (weight 1)"
+}

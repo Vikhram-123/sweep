@@ -1,0 +1,8 @@
+{
+  "name": "app_csa_listwise",
+  "split": "test",
+  "compat_auc": 0.9245227399581094,
+  "fitb_acc": 0.6875536480686695,
+  "best_epoch": 5,
+  "notes": "CSA-Net subspaces + listwise loss"
+}

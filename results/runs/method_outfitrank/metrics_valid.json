@@ -1,0 +1,8 @@
+{
+  "name": "method_outfitrank",
+  "split": "valid",
+  "compat_auc": 0.8558261666666667,
+  "fitb_acc": 0.551,
+  "best_epoch": 19,
+  "notes": "CSA-Net outfit ranking hinge (semi-hard, margin 0.3), mean pooling"
+}

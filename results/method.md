@@ -33,3 +33,21 @@ fine-tuned, a handicap relative to every published row (they train ResNet-18 end
 InfoNCE helps a lot on ResNet-18: +0.033 validation AUC, and test 0.847 / 56.1% (vs 0.822 / 52.2%).
 It now beats SiameseNet (0.81/51.8) and CSN (0.82/52.5) with a frozen backbone. Learned temperature
 τ ≈ 0.25: weaker features → a softer softmax over candidates. Best epochs 12–18.
+
+
+## Steps 2–4 — outfit-level losses and pooling (screening, seed 0)
+
+| model | val AUC | val FITB | test AUC | test FITB |
+|---|---|---|---|---|
+| InfoNCE (step-1 winner, seed 0) | 0.883 | 58.3% | 0.851 | 56.0% |
+| listwise FITB loss, 16 candidates, mean pooling | 0.884 | 59.0% | 0.850 | 56.4% |
+| listwise + InfoNCE (weight 1) | 0.876 | 58.4% | 0.843 | 55.6% |
+| **listwise + type-aware attention pooling** | 0.886 | 59.2% | 0.857 | 57.1% |
+| CSA-Net outfit ranking hinge (margin 0.3), mean pooling | 0.856 | 55.1% | 0.822 | 52.8% |
+| CSA-Net subspaces + outfit ranking hinge | 0.844 | 53.6% | 0.809 | 51.7% |
+| CSA-Net subspaces + listwise loss | 0.882 | 58.0% | 0.844 | 55.7% |
+
+**Screening winner on validation: listwise + attention pooling** (+0.004 val AUC, +0.9 FITB over InfoNCE seed 0).
+The listwise loss alone ties InfoNCE, and adding InfoNCE on top hurts. The outfit ranking hinge is clearly
+worse (−0.03 to −0.04 val AUC), with or without CSA subspaces. CSA subspaces with the listwise loss come close to plain listwise.
+The gaps between the top three rows are about the size of seed noise. Seeds 1–2 of the winner follow.

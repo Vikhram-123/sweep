@@ -1,0 +1,8 @@
+{
+  "name": "app_outfitrank",
+  "split": "test",
+  "compat_auc": 0.9076790017396487,
+  "fitb_acc": 0.6613403763618356,
+  "best_epoch": 10,
+  "notes": "CSA-Net outfit ranking hinge (semi-hard, margin 0.3), mean pooling"
+}

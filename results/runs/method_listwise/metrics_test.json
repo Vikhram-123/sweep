@@ -1,0 +1,8 @@
+{
+  "name": "method_listwise",
+  "split": "test",
+  "compat_auc": 0.8502530561565046,
+  "fitb_acc": 0.5640145262462859,
+  "best_epoch": 16,
+  "notes": "listwise FITB loss, 16 candidates, mean pooling"
+}

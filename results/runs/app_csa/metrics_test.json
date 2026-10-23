@@ -1,0 +1,8 @@
+{
+  "name": "app_csa",
+  "split": "test",
+  "compat_auc": 0.9047646100897007,
+  "fitb_acc": 0.6671508748761967,
+  "best_epoch": 6,
+  "notes": "CSA-Net - 5 shared subspaces with category-pair attention + outfit ranking loss"
+}
