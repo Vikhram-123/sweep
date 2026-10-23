@@ -1,0 +1,8 @@
+{
+  "name": "zooclaw_fashionsiglip2_cosine",
+  "split": "test",
+  "compat_auc": 0.7602804560863778,
+  "fitb_acc": 0.5411687025420931,
+  "eval_seconds": 2.2,
+  "notes": "mean pairwise cosine of frozen zooclaw_fashionsiglip2 embeddings"
+}

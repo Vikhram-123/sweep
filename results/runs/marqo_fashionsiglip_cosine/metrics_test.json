@@ -1,0 +1,8 @@
+{
+  "name": "marqo_fashionsiglip_cosine",
+  "split": "test",
+  "compat_auc": 0.7631021028048334,
+  "fitb_acc": 0.5410366457576758,
+  "eval_seconds": 2.2,
+  "notes": "mean pairwise cosine of frozen marqo_fashionsiglip embeddings"
+}

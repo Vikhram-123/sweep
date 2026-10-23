@@ -15,6 +15,8 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 | text_cosine | FashionCLIP text (frozen) | 1 |  |  | 0.657 | 41.7% | mean pairwise cosine of frozen text embeddings |
 | tv_resnet18_cosine | torchvision ResNet-18, 224 px (frozen) | 1 |  |  | 0.577 | 33.2% | mean pairwise cosine of frozen tv_resnet18 embeddings |
 | tv_resnet18_paper_cosine | torchvision ResNet-18, paper layout 112 px / layer3 (frozen) | 1 |  |  | 0.588 | 36.7% | mean pairwise cosine of frozen tv_resnet18_paper embeddings |
+| marqo_fashionsiglip_cosine | Marqo-FashionSigLIP ViT-B/16 (frozen) | 1 |  |  | 0.763 | 54.1% | mean pairwise cosine of frozen marqo_fashionsiglip embeddings |
+| zooclaw_fashionsiglip2_cosine | ZooClaw-FashionSigLIP2 (frozen) | 1 |  |  | 0.760 | 54.1% | mean pairwise cosine of frozen zooclaw_fashionsiglip2 embeddings |
 
 **Model A / Model B (FashionCLIP)**
 

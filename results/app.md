@@ -46,3 +46,17 @@ The margins here are within seed noise (±0.002). Seeds 1–2 of the winner foll
 Over 3 seeds, attention pooling **wins on validation on every seed** (val 0.945 / 70.4% vs 0.943 / 70.1%). The gain is small but holds on every seed.
 Test is 0.926 ± 0.003 / 69.3% ± 0.1, vs 0.921 / 68.2%. It peaks at epochs 5–6 (InfoNCE peaked at epochs 1–2), with τ ≈ 0.06.
 **Carried forward: listwise + attention.**
+
+## Phase 2 — candidate encoders (frozen embeddings + cosine baseline)
+
+Full catalog embedded (train 71,967 / valid 14,657 / test 70,035 items, 768-d). Zero-training cosine baseline (test):
+
+| encoder | cosine AUC | cosine FITB |
+|---|---|---|
+| FashionCLIP ViT-B/32 (current) | 0.753 | 52.4% |
+| Marqo-FashionSigLIP ViT-B/16 | 0.763 | 54.1% |
+| ZooClaw-FashionSigLIP2 | 0.760 | 54.1% |
+
+Both SigLIP encoders beat FashionCLIP out of the box (+0.01 AUC, +1.7 FITB). This is only a hint, because
+the cosine baseline has no training. The encoder is chosen after training the step 2–4 winner
+(listwise + attention) on each one, on validation.
