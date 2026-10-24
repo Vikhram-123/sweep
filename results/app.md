@@ -60,3 +60,21 @@ Full catalog embedded (train 71,967 / valid 14,657 / test 70,035 items, 768-d). 
 Both SigLIP encoders beat FashionCLIP out of the box (+0.01 AUC, +1.7 FITB). This is only a hint, because
 the cosine baseline has no training. The encoder is chosen after training the step 2–4 winner
 (listwise + attention) on each one, on validation.
+
+### Phase 2 — listwise + attention on each encoder (screening, seed 0)
+
+Identical config to the step 2–4 winner; only the frozen encoder changes.
+
+| encoder | val AUC | val FITB | test AUC | test FITB |
+|---|---|---|---|---|
+| FashionCLIP ViT-B/32 | 0.945 | 71.1% | 0.929 | 69.3% |
+| Marqo-FashionSigLIP ViT-B/16 | 0.948 | 71.6% | 0.933 | 71.0% |
+| ZooClaw-FashionSigLIP2 ViT-B/16 @384 | 0.952 | 73.0% | 0.937 | 72.1% |
+
+Both beat FashionCLIP on validation, so both get seeds 1–2.
+
+**ZooClaw source check.** It is published by `srpone` ("SRP"), a verified Hugging Face org (7 members) tied to the ZooClaw
+platform (GitHub links point to SerendipityOneInc), with an arXiv paper (2606.27708). It is fine-tuned from
+`google/siglip2-base-patch16-384` and licensed Apache-2.0. It uses the standard transformers `SiglipModel`, with no
+`auto_map`, no repo `.py` files and safetensors weights only, so it needs no `trust_remote_code`. **Caveat:** its training
+data isn't disclosed, so Polyvore exposure can't be ruled out. Marqo-FashionSigLIP has the same unknown about its pretraining data.
