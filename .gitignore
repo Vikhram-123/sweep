@@ -10,3 +10,4 @@ data/
 results/runs/*/model.pt
 logs/
 checkpoints/
+results/runs/_smoke_*/
