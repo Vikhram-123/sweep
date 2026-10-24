@@ -78,3 +78,17 @@ platform (GitHub links point to SerendipityOneInc), with an arXiv paper (2606.27
 `google/siglip2-base-patch16-384` and licensed Apache-2.0. It uses the standard transformers `SiglipModel`, with no
 `auto_map`, no repo `.py` files and safetensors weights only, so it needs no `trust_remote_code`. **Caveat:** its training
 data isn't disclosed, so Polyvore exposure can't be ruled out. Marqo-FashionSigLIP has the same unknown about its pretraining data.
+
+### Phase 2 — 3-seed confirmation
+
+| encoder | seeds | val AUC | val FITB | **test AUC** | **test FITB** |
+|---|---|---|---|---|---|
+| FashionCLIP ViT-B/32 | 3 | 0.945 | 70.4% | 0.926 ± 0.003 | 69.3% ± 0.1 |
+| Marqo-FashionSigLIP ViT-B/16 | 3 | 0.949 | 71.5% | 0.932 ± 0.001 | 70.7% ± 0.4 |
+| **ZooClaw-FashionSigLIP2 ViT-B/16 @384** | 3 | 0.952 | 72.4% | 0.935 ± 0.002 | 71.7% ± 0.3 |
+
+**Chosen on validation: ZooClaw-FashionSigLIP2.** It has the highest validation AUC on every seed (0.952 / 0.951 / 0.952 vs Marqo
+0.948 / 0.949 / 0.951 vs FashionCLIP 0.945 / 0.945 / 0.945). Mean val 0.952 / 72.4%; test 0.935 ± 0.002 / 71.7% ± 0.3 (+0.009 AUC,
++2.4 FITB over FashionCLIP). Training on frozen embeddings costs the same, but embedding at 384 px is about 3× slower than Marqo at 224
+(2 h vs 40 min for the catalog), so the app pays more per scanned item. Subject to the training-data caveat above.
+`finetune_app.yaml` now points at it.

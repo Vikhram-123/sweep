@@ -33,6 +33,8 @@ transformer,ours,FashionCLIP (frozen),3,0.913329,0.605,0.8922472204150459,0.0027
 transformer_text,ours,FashionCLIP (frozen) + title text (concat),3,0.9224040370370371,0.6041111111111112,0.9039166331783478,0.0015871069079293483,0.5887751733245296,0.003995126974554187,"outfit transformer, image + title text (concat) inputs"
 app_infonce,ours,FashionCLIP (frozen),3,0.9428953703703703,0.7011111111111111,0.9214054957464658,0.0011600752756265645,0.6819852536590734,0.002548159901117008,"Model A trained with InfoNCE (in-batch same-category negatives, learned temperature)"
 app_listwise_attn,ours,"FashionCLIP (frozen)",3,0.9449267037037036,0.7036666666666668,0.9262841350602152,0.002512329324657258,0.6930119951579178,0.0008360699862758733,"listwise FITB loss (16 candidates) + type-aware attention pooling"
+app_listwise_attn_marqo_fashionsiglip,ours,"Marqo-FashionSigLIP ViT-B/16 (frozen)",3,0.9492953333333333,0.7154444444444445,0.9320251631608656,0.001124187133971936,0.7068339385935952,0.0035655331792671108,"listwise FITB loss (16 candidates) + type-aware attention pooling, frozen marqo_fashionsiglip"
+app_listwise_attn_zooclaw_fashionsiglip2,ours,"ZooClaw-FashionSigLIP2 (frozen)",3,0.9517121111111111,0.7243333333333334,0.9348401351042487,0.002305090447227106,0.71687025420931,0.003287524406604055,"listwise FITB loss (16 candidates) + type-aware attention pooling, frozen zooclaw_fashionsiglip2"
 Bi-LSTM + VSE (Han et al. 2017),published,ResNet-18 (fine-tuned) + text,,,,0.62,,0.394,,"Vasileva et al. 2018, Table 5"
 SiameseNet,published,ResNet-18 (fine-tuned),,,,0.81,,0.518,,"Vasileva et al. 2018, Table 5"
 Type-aware CSN T1:1,published,ResNet-18 (fine-tuned),,,,0.82,,0.525,,"Vasileva et al. 2018, Table 5"

@@ -1,0 +1,8 @@
+{
+  "name": "app_listwise_attn_marqo_fashionsiglip_seed1",
+  "split": "test",
+  "compat_auc": 0.9318684193001273,
+  "fitb_acc": 0.7032684054143281,
+  "best_epoch": 6,
+  "notes": "listwise loss, type-aware attention pooling, frozen marqo_fashionsiglip"
+}

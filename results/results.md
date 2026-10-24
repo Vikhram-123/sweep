@@ -85,6 +85,8 @@ Trained models: mean ± std over seeds. Every choice was made on **validation**;
 |---|---|---|---|---|---|---|---|
 | app_infonce | FashionCLIP (frozen) | 3 | 0.943 | 70.1% | 0.921 ± 0.001 | 68.2% ± 0.3 | Model A trained with InfoNCE (in-batch same-category negatives, learned temperature) |
 | app_listwise_attn | FashionCLIP (frozen) | 3 | 0.945 | 70.4% | 0.926 ± 0.003 | 69.3% ± 0.1 | listwise FITB loss (16 candidates) + type-aware attention pooling |
+| app_listwise_attn_marqo_fashionsiglip | Marqo-FashionSigLIP ViT-B/16 (frozen) | 3 | 0.949 | 71.5% | 0.932 ± 0.001 | 70.7% ± 0.4 | listwise FITB loss (16 candidates) + type-aware attention pooling, frozen marqo_fashionsiglip |
+| app_listwise_attn_zooclaw_fashionsiglip2 | ZooClaw-FashionSigLIP2 (frozen) | 3 | 0.952 | 72.4% | 0.935 ± 0.002 | 71.7% ± 0.3 | listwise FITB loss (16 candidates) + type-aware attention pooling, frozen zooclaw_fashionsiglip2 |
 
 **Published (Polyvore Outfits disjoint)**
 

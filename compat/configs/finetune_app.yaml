@@ -1,7 +1,7 @@
 # App track: the best image encoder from Phase 2, last few transformer blocks unfrozen.
 name: ft_app
 notes: fashion ViT encoder, last 4 blocks + head fine-tuned, InfoNCE, 128-d
-encoder: fashionclip          # set to the Phase 2 winner (fashionclip | marqo_fashionsiglip | zooclaw_fashionsiglip2)
+encoder: zooclaw_fashionsiglip2  # Phase 2 winner (val 0.952, 3 seeds); options (fashionclip | marqo_fashionsiglip | zooclaw_fashionsiglip2)
 unfreeze_blocks: 4            # of 12; the rest stay frozen (keeps the pretrained knowledge, cuts memory)
 seed: 0
 device: auto

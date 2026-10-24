@@ -1,0 +1,25 @@
+name: app_listwise_attn_zooclaw_fashionsiglip2_seed1
+model: outfit
+projection_model: pairwise
+loss: listwise
+pool: attention
+infonce_weight: 0.0
+notes: listwise loss, type-aware attention pooling, frozen zooclaw_fashionsiglip2
+seed: 1
+device: cpu
+encoder: zooclaw_fashionsiglip2
+hidden: 256
+out_dim: 128
+dropout: 0.1
+normalize: true
+n_neg: 15
+attn_dim: 32
+n_subspaces: 5
+temperature_init: 0.07
+margin: 0.2
+lr: 0.001
+weight_decay: 0.0001
+batch_size: 256
+pair_batch_size: 512
+max_epochs: 50
+patience: 5

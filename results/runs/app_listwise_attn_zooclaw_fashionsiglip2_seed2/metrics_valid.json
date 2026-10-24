@@ -1,0 +1,8 @@
+{
+  "name": "app_listwise_attn_zooclaw_fashionsiglip2_seed2",
+  "split": "valid",
+  "compat_auc": 0.9523683888888889,
+  "fitb_acc": 0.7173333333333334,
+  "best_epoch": 10,
+  "notes": "listwise loss, type-aware attention pooling, frozen zooclaw_fashionsiglip2"
+}
