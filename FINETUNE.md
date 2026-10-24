@@ -138,6 +138,7 @@ Check that it runs, then submit:
 srun -p gpu-common --gres=gpu:1 --mem=16G --time=00:30:00 --pty bash -i   # interactive GPU shell
 conda activate sweep && cd /work/$USER/sweep
 python -m compat.finetune compat/configs/finetune_method.yaml --smoke
+python -m compat.finetune compat/configs/finetune_method.yaml --smoke --set freeze_epochs=0   # smoke is 1 epoch = the frozen warmup; this also checks the encoder backward pass
 python -m compat.finetune compat/configs/finetune_method.yaml --find-batch
 exit
 

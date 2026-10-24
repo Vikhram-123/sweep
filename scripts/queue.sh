@@ -7,7 +7,7 @@ cd "${0:A:h}/.."
 jobs_file=$1; log=$2
 wait_turn() {
   local n=0
-  while pgrep -f "compat\.(train|embed_items|embed_text|baselines|leakage|analyze)" >/dev/null; do
+  while pgrep -f "compat\.(train|finetune|embed_items|embed_text|baselines|leakage|analyze)" >/dev/null; do
     sleep 15; n=$((n + 1))
     (( n % 40 == 0 )) && echo "$(date +%T) waiting for another job to finish" >> $log
   done
