@@ -337,6 +337,11 @@ def train(cfg: dict, ckpt_dir: Path, smoke: bool = False) -> dict:
     last = ckpt_dir / "last.pt"
     if last.exists() and not smoke:
         ck = torch.load(last, map_location=device, weights_only=False)
+        # The resume position is a step count, so it is only valid for the same batch and epoch size.
+        for k in ("batch_size", "pairs_per_epoch"):
+            if ck["config"][k] != cfg[k]:
+                raise SystemExit(f"{last} was saved with {k}={ck['config'][k]}, this run has {k}={cfg[k]}. "
+                                 f"Resume with the same value (--set {k}={ck['config'][k]}) or use a new --ckpt-dir.")
         encoder.load_state_dict(ck["encoder"]); head.load_state_dict(ck["head"])
         log_scale.data.copy_(ck["log_scale"]); opt.load_state_dict(ck["opt"])
         if scaler is not None and ck.get("scaler"):
@@ -352,6 +357,8 @@ def train(cfg: dict, ckpt_dir: Path, smoke: bool = False) -> dict:
                      "history": history, "rng": rng_state(), "config": cfg}, last)
 
     for epoch in range(start_epoch, cfg["max_epochs"]):
+        if bad >= cfg["patience"]:
+            break  # resumed a run that had already stopped early: go straight to the final evaluation
         # Each epoch's pairs come from an RNG seeded by (seed, epoch), so a resumed epoch replays exactly.
         rng = np.random.default_rng([seed, epoch])
         rows = sampler.epoch(rng)[:pairs_per_epoch]
