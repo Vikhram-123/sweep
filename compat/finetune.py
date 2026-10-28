@@ -243,10 +243,20 @@ def rng_state():
             "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None}
 
 
+def _cpu_bytes(t) -> torch.Tensor:
+    """torch.load(map_location=<device>) moves saved RNG states to that device; the setters need CPU uint8."""
+    return torch.as_tensor(t).detach().to(device="cpu", dtype=torch.uint8)
+
+
 def set_rng_state(s):
-    random.setstate(s["python"]); np.random.set_state(s["numpy"]); torch.set_rng_state(s["torch"])
+    random.setstate(s["python"])
+    kind, keys, *rest = s["numpy"]
+    np.random.set_state((kind, np.asarray(keys.cpu() if torch.is_tensor(keys) else keys, dtype=np.uint32), *rest))
+    torch.set_rng_state(_cpu_bytes(s["torch"]))
     if s["cuda"] is not None and torch.cuda.is_available():
-        torch.cuda.set_rng_state_all(s["cuda"])
+        # one state per GPU that saved it; restore those this machine also has
+        for i, st in enumerate(s["cuda"][:torch.cuda.device_count()]):
+            torch.cuda.set_rng_state(_cpu_bytes(st), i)
 
 
 # ----------------------------------------------------------------------------- main loop

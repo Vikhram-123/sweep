@@ -35,3 +35,32 @@ def test_partial_unfreeze_trains_only_last_blocks_and_tail():
     enc.set_trainable("all")
     assert all(p.requires_grad for p in enc.body.parameters())
     assert enc.set_trainable(0) == [] and not any(p.requires_grad for p in enc.body.parameters())
+
+
+DEVICES = ["cpu",
+           pytest.param("mps", marks=pytest.mark.skipif(not torch.backends.mps.is_available(), reason="no MPS")),
+           pytest.param("cuda", marks=pytest.mark.skipif(not torch.cuda.is_available(), reason="no CUDA"))]
+
+
+@pytest.mark.parametrize("load_on", DEVICES)
+def test_rng_state_round_trip_saved_on_cpu_loaded_on_any_device(tmp_path, load_on):
+    """Resume loads checkpoints with map_location=<training device>, which moves the saved RNG tensors there."""
+    import random
+
+    import numpy as np
+
+    from compat.finetune import rng_state, save_atomic, set_rng_state
+
+    random.seed(1); np.random.seed(1); torch.manual_seed(1)
+    state = rng_state()
+    # A checkpoint from a CUDA machine also carries per-GPU states; here they must load on any machine.
+    state["cuda"] = state["cuda"] or [torch.get_rng_state(), torch.get_rng_state()]
+    save_atomic({"rng": state}, tmp_path / "last.pt")
+    expected = (random.random(), float(np.random.rand()), torch.rand(3))
+
+    random.seed(2); np.random.seed(2); torch.manual_seed(2)          # move every generator elsewhere
+    ck = torch.load(tmp_path / "last.pt", map_location=load_on, weights_only=False)
+    assert ck["rng"]["torch"].device.type == load_on                 # the condition that used to crash
+    set_rng_state(ck["rng"])
+    got = (random.random(), float(np.random.rand()), torch.rand(3))
+    assert got[0] == expected[0] and got[1] == expected[1] and torch.equal(got[2], expected[2])
